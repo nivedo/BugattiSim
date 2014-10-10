@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<unit>
+		<id>50001</id>
+		<name>CDSiege0</name>
+		<fortress_type>2</fortress_type>
+		<cost>5</cost>
+		<skill id="rally" x="6"/>
+    <skill id="siege" x="3" all="1"/>
+		<health>18</health>
+		<type>3</type>
+		<set>5555</set>
+	</unit>
+	<unit>
+		<id>50002</id>
+		<name>CDSiege1</name>
+		<fortress_type>2</fortress_type>
+		<health>16</health>
+		<cost>4</cost>
+		<skill id="protect" x="3"/>
+    <skill id="rally" x="3"/>
+    <skill id="strike" x="3"/>
+		<type>5</type>
+		<set>5555</set>
+	</unit>
+  <unit>
+		<id>50003</id>
+		<name>CDSiege2</name>
+		<fortress_type>2</fortress_type>
+		<health>24</health>
+		<cost>5</cost>
+		<skill id="rally" x="3" all="1"/>
+		<type>5</type>
+		<set>5555</set>
+	</unit>
+	<unit>
+		<id>50004</id>
+		<name>CDDefense0</name>
+		<fortress_type>1</fortress_type>
+		<cost>5</cost>
+		<skill id="protect" x="3"/>
+    <skill id="rally" x="3"/>
+    <skill id="strike" x="3"/>
+		<health>18</health>
+		<type>3</type>
+		<set>5555</set>
+	</unit>
+	<unit>
+		<id>50005</id>
+		<name>CDDefense1</name>
+		<fortress_type>1</fortress_type>
+		<cost>4</cost>
+		<rarity>3</rarity>
+		<skill id='wall' />
+		<skill id='heal' x='4' all='1' />
+		<health>27</health>
+		<type>5</type>
+		<set>5555</set>
+	</unit>
+</root>

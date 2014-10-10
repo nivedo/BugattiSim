@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tyrantlib.controller.BugattiController">
+   <left>
+      <SplitPane fx:id="ControlLeft" dividerPositions="0.44766146993318484" orientation="VERTICAL" prefHeight="900.0" prefWidth="260.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane maxHeight="400.0" minHeight="400.0" minWidth="0.0" prefHeight="400.0" prefWidth="232.0">
+               <children>
+                  <VBox fx:id="deckEntryPane" layoutX="57.0" layoutY="46.0" prefHeight="395.0" prefWidth="214.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="259.0" text="Deck Entry">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextArea fx:id="deckEntryArea" prefHeight="359.0" prefWidth="214.0" wrapText="true">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </TextArea>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="490.0" prefWidth="245.0">
+               <children>
+                  <VBox fx:id="deckButtonPane" layoutX="82.0" layoutY="267.0" prefHeight="491.0" prefWidth="242.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button fx:id="addButton" mnemonicParsing="false" prefHeight="45.0" prefWidth="272.0" text="Add Deck">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="removeButton" mnemonicParsing="false" prefHeight="45.0" prefWidth="272.0" text="Remove Deck">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="loadButton" mnemonicParsing="false" prefHeight="45.0" prefWidth="272.0" text="Load Decks">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="saveButton" mnemonicParsing="false" prefHeight="45.0" prefWidth="272.0" text="Save Decks">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="clearButton" mnemonicParsing="false" prefHeight="45.0" prefWidth="272.0" text="Clear Decklist">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </left>
+   <right>
+      <SplitPane fx:id="ControlRight" dividerPositions="0.4532085561497326" orientation="VERTICAL" prefHeight="761.0" prefWidth="260.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="305.0" prefWidth="160.0">
+               <children>
+                  <VBox fx:id="simulationPane" layoutX="10.0" layoutY="10.0" prefHeight="425.0" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="335.0" text="Simulation Options">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="20.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label text="Mode:">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
+                        <ComboBox fx:id="modeBox" prefWidth="325.0">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></ComboBox>
+                        <Label text="Battleground Effect:">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin></Label>
+                        <ComboBox fx:id="bgEffectBox" prefWidth="272.0">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </ComboBox>
+                        <CheckBox fx:id="enableFortCheck" mnemonicParsing="false" text="Enable Fortress">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <Accordion />
+                        <Accordion />
+                        <Accordion />
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <Button fx:id="runButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="272.0" text="Run Simulation" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="421.0" prefWidth="292.0">
+               <children>
+                  <VBox fx:id="optimizePane" layoutX="15.0" layoutY="15.0" prefHeight="463.0" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="27.0" prefWidth="335.0" text="Optimization Options">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="20.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <RadioButton fx:id="optOrderRadio" mnemonicParsing="false" text="Optimize Attack">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="optimizeGroup" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="optDefenseRadio" mnemonicParsing="false" text="Optimize Defense" toggleGroup="$optimizeGroup">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </RadioButton>
+                        <Label text="Bench:">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin></Label>
+                        <TextArea fx:id="benchArea" prefHeight="162.0" prefWidth="272.0" wrapText="true" />
+                        <Separator prefWidth="200.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <Button fx:id="optimizeButton" mnemonicParsing="false" prefHeight="60.0" prefWidth="272.0" text="Optimize Deck">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </right>
+   <center>
+      <SplitPane dividerPositions="0.7967914438502673" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="722.0" prefWidth="814.0">
+               <children>
+                  <TableView fx:id="deckTable" prefHeight="888.0" prefWidth="814.0" stylesheets="@bugatti.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columns>
+                        <TableColumn fx:id="deckColumn" prefWidth="572.0" text="Deck List" />
+                        <TableColumn fx:id="avgColumn" prefWidth="62.0" text="AVG" />
+                        <TableColumn fx:id="atkColumn" prefWidth="61.0" text="ATK" />
+                        <TableColumn fx:id="defColumn" prefWidth="64.0" text="DEF" />
+                     </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+          <AnchorPane fx:id="fortressPane" maxHeight="250.0" minHeight="0.0" minWidth="0.0" prefHeight="250.0" prefWidth="814.0">
+               <children>
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="154.0" prefWidth="814.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <VBox prefHeight="182.0" prefWidth="204.0">
+                           <children>
+                              <Label text="My Defense:">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></Label>
+                              <ComboBox fx:id="defenseBox0" prefWidth="294.0">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></ComboBox>
+                              <ComboBox fx:id="defenseBox1" prefWidth="294.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                        <VBox prefHeight="182.0" prefWidth="204.0">
+                           <children>
+                              <Label text="My Siege:">
+                                 <padding>
+                                    <Insets bottom="5.0" />
+                                 </padding></Label>
+                              <ComboBox fx:id="siegeBox0" prefWidth="294.0">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></ComboBox>
+                              <ComboBox fx:id="siegeBox1" prefWidth="294.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                        <VBox prefHeight="182.0" prefWidth="204.0">
+                           <children>
+                              <Label text="Enemy Siege:">
+                                 <padding>
+                                    <Insets bottom="5.0" />
+                                 </padding></Label>
+                              <ComboBox fx:id="enemySiegeBox0" prefWidth="294.0">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></ComboBox>
+                              <ComboBox fx:id="enemySiegeBox1" prefWidth="294.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                        <VBox prefHeight="182.0" prefWidth="204.0">
+                           <children>
+                              <Label text="Enemy Defense:">
+                                 <padding>
+                                    <Insets bottom="5.0" />
+                                 </padding></Label>
+                              <ComboBox fx:id="enemyDefenseBox0" prefWidth="294.0">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin></ComboBox>
+                              <ComboBox fx:id="enemyDefenseBox1" prefWidth="294.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
+</BorderPane>
