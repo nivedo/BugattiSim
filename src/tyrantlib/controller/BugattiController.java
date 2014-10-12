@@ -396,19 +396,25 @@ public class BugattiController {
         ArrayList<String> skillTypes = new ArrayList<String>();
         String skillName = "";
         for(SkillType stype : SkillType.values()) {
-            if(stype != SkillType.UNKNOWN && stype != SkillType.ENHANCE && stype != SkillType.WALL && stype != SkillType.PROGENITOR) {
+            if(SkillType.isEnhancableSkill(stype)) {
                 skillName = stype.name();
                 for(int i = 1; i <= 3; i++) {
                     skillTypes.add("Enhance All " + skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
                 }
             }
-            if(SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
+            if(stype == SkillType.PROGENITOR || stype == SkillType.REAPING || SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
                 switch(stype) {
                     case PROGENITOR:
                         skillName = stype.name();
                         skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " 1");
                         break;
                     case OVERLOAD:
+                        skillName = stype.name();
+                        for (int i = 1; i <= 3; i++) {
+                            skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
+                        }
+                        break;
+                    case REAPING:
                         skillName = stype.name();
                         for (int i = 1; i <= 3; i++) {
                             skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);

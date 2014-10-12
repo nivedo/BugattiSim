@@ -10,7 +10,7 @@ public enum SkillType {
     ENFEEBLE, HEAL, PROTECT, RALLY, SIEGE, STRIKE, WEAKEN, JAM, ENHANCE,
     PIERCE, BERSERK, LEECH, POISON, INHIBIT,
     EVADE, ARMORED, COUNTER, CORROSIVE, WALL, FLURRY,
-    OVERLOAD, VALOR, PROGENITOR, UNKNOWN;
+    OVERLOAD, VALOR, PROGENITOR, REAPING, UNKNOWN;
 
     // Activated Abilities
     public static final Set<SkillType> ACTIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
@@ -20,7 +20,6 @@ public enum SkillType {
 
     // Abilities on Attack Phase
     public static final Set<SkillType> ATTACK_SKILLS = new HashSet<SkillType>(Arrays.asList(
-
             new SkillType[] {SkillType.PIERCE, SkillType.BERSERK, SkillType.LEECH, SkillType.POISON, SkillType.INHIBIT}
     ));
 
@@ -30,9 +29,15 @@ public enum SkillType {
                     SkillType.WALL, SkillType.FLURRY, SkillType.VALOR}
     ));
 
+    // Not enhancable
+    public static final Set<SkillType> NO_ENHANCE_SKILLS = new HashSet<SkillType>(Arrays.asList(
+            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING }
+    ));
+
     public static boolean isActiveSkill(SkillType id) { return SkillType.ACTIVE_SKILLS.contains(id); }
     public static boolean isAttackSkill(SkillType id) { return SkillType.ATTACK_SKILLS.contains(id); }
     public static boolean isPassiveSkill(SkillType id) { return SkillType.PASSIVE_SKILLS.contains(id); }
+    public static boolean isEnhancableSkill(SkillType id) { return !SkillType.NO_ENHANCE_SKILLS.contains(id); }
 
     public static SkillType stringToSkillType(String id) {
         for(SkillType st : SkillType.values()) {

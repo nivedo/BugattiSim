@@ -37,8 +37,8 @@ public class ActiveDeck {
     private ActiveCard[] fortress = new ActiveCard[2];
 
     public void setFortress(Card fort0, Card fort1) {
-        if(fort0 != null) fortress[0] = new ActiveCard(fort0);
-        if(fort1 != null) fortress[1] = new ActiveCard(fort1);
+        if(fort0 != null) fortress[0] = new ActiveCard(fort0, this);
+        if(fort1 != null) fortress[1] = new ActiveCard(fort1, this);
 
         reset();
     }
@@ -47,20 +47,23 @@ public class ActiveDeck {
 
     private Skill bgEffect;
     private boolean progEffect;
+    private boolean reapEffect;
+    private Skill reapHeal;
+    private Skill reapRally;
 
     public ActiveDeck( Deck deck ) {
         this.deck = deck;
         assert deck.getNumCards() > 0;
 
         for(int i = 0; i < deck.getNumCards(); i++) {
-            activeCards[i] = new ActiveCard(deck.getCards()[i]);
+            activeCards[i] = new ActiveCard(deck.getCards()[i], this);
         }
 
         drawOrder = new int[deck.getNumCards()];
         this.priorityPlayed = new boolean[deck.getNumCards()];
 
         // Set commander right away
-        commander = new ActiveCard( deck.getCommander() );
+        commander = new ActiveCard( deck.getCommander(), this );
 
         seedDraws();
     }
@@ -71,6 +74,21 @@ public class ActiveDeck {
         bgEffect = new Skill();
         if(options.bgEffect==SkillType.PROGENITOR) {
             progEffect = true;
+        }
+        else if(options.bgEffect==SkillType.REAPING) {
+            reapEffect = true;
+            if(reapHeal == null) {
+                reapHeal = new Skill();
+                reapHeal.setId(SkillType.HEAL);
+                reapHeal.all = true;
+                reapHeal.x = options.bgX;
+            }
+            if(reapRally == null) {
+                reapRally = new Skill();
+                reapRally.setId(SkillType.RALLY);
+                reapRally.all = true;
+                reapRally.x = options.bgX;
+            }
         }
         else if (!options.isEnhance) {
             bgEffect.setId(options.bgEffect);
@@ -144,6 +162,14 @@ public class ActiveDeck {
             if(card.inhibited > 0 && card.health > 0) return true;
         }
         return false;
+    }
+
+    public void onUnitDeath() {
+        // Special BGE
+        if(reapEffect) {
+            applySkill(null, reapHeal, this);
+            applySkill(null, reapRally, this);
+        }
     }
 
     // Targeting Functions - Single variable for all targets
@@ -245,6 +271,7 @@ public class ActiveDeck {
         drawPhase();
         playPhase();
         startPhase();
+        precombatPhase(enemyDeck);
         commanderPhase(enemyDeck);
         structurePhase(enemyDeck);
         assaultPhase(enemyDeck);
@@ -322,6 +349,18 @@ public class ActiveDeck {
             }
 
             card.acted = true;
+        }
+    }
+
+    public void precombatPhase(ActiveDeck enemyDeck) {
+        for(int i = 0; i < assaults.size(); i++) {
+            ActiveCard card = assaults.get(i);
+
+            if(card.canAct()) {
+                ActiveCard opCard = null;
+                if(i < enemyDeck.assaults.size()) { opCard = enemyDeck.assaults.get(i); }
+                card.preCombat(opCard);
+            }
         }
     }
 

@@ -11,6 +11,8 @@ public class ActiveCard {
     // Underlying TU Card
     private final Card card;
 
+    private final ActiveDeck deck;
+
     // Current base stats
     protected int attack;
     protected int health;
@@ -138,7 +140,15 @@ public class ActiveCard {
     public void removeHealth(int damage) {
         assert health > 0;
         health -= damage;
-        if( health < 0 ) health = 0;
+        if( health <= 0 ) {
+            health = 0;
+            onDeath();
+        }
+    }
+
+    public void onDeath() {
+        // Special BGE callback
+        deck.onUnitDeath();
     }
 
     public void addHealth(int heal) {
@@ -265,19 +275,20 @@ public class ActiveCard {
     }
     */
 
+    public void preCombat(ActiveCard opposingCard) {
+        // Apply Valor on first activation
+        if(opposingCard != null && !valorActive && opposingCard.isAssault() && getEffectiveAttack() < opposingCard.getEffectiveAttack()) {
+            valorNum += valor;
+        }
+        valorActive = true;
+    }
+
     // Attacks an enemy unit (assault > wall > commander)
     public void attack(ActiveCard targetCard) {
         assert health > 0 && isAssault() && canAct();
         assert (!isStructure() || wall);
 
         int effectiveAttack = getEffectiveAttack();
-
-        // Apply Valor on first activation
-        if(!valorActive && targetCard.isAssault() && effectiveAttack < targetCard.getEffectiveAttack()) {
-            valorNum += valor;
-            effectiveAttack += valor;
-        }
-        valorActive = true;
 
         if(effectiveAttack > 0) {
             attacked = true;
@@ -318,8 +329,9 @@ public class ActiveCard {
         }
     }
 
-    public ActiveCard( Card card ) {
+    public ActiveCard( Card card, ActiveDeck deck ) {
         this.card = card;
+        this.deck = deck;
         reset();
     }
 
