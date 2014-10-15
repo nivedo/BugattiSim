@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
 
 public class SimulatorV2 {
 
-    private ArrayList<Deck> gauntlet;
+    private Gauntlet gauntlet;
     private Deck playerDeck;
     private int numRuns = 150;
     private static int MAX_TURNS = 80;
@@ -31,7 +31,7 @@ public class SimulatorV2 {
         useMultiOpt = true;
     }
 
-    public SimulatorV2(Deck playerDeck, ArrayList<Deck> gauntlet, BGOptions options) {
+    public SimulatorV2(Deck playerDeck, Gauntlet gauntlet, BGOptions options) {
         this.playerDeck = playerDeck;
         this.gauntlet = gauntlet;
         this.options = options;
@@ -46,7 +46,7 @@ public class SimulatorV2 {
         numRuns = n;
 
         if(!useMultiOpt) {
-            for (Deck gauntletDeck : gauntlet) {
+            for (Deck gauntletDeck : gauntlet.getDeckList()) {
                 Field field;
                 if(options.isAttack) {
                     field = new Field(playerDeck, gauntletDeck, options.surge, numRuns);
@@ -66,7 +66,7 @@ public class SimulatorV2 {
                 bgopt.bgX = options.bgX;
 
                 double weight = weights.get(i);
-                for (Deck gauntletDeck : gauntlet) {
+                for (Deck gauntletDeck : gauntlet.getDeckList()) {
                     Field field;
                     if(options.isAttack) {
                         field = new Field(playerDeck, gauntletDeck, bgopt.surge, numRuns);

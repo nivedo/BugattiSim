@@ -14,7 +14,8 @@ import javafx.beans.property.IntegerProperty;
 
 public class Simulator {
 
-    private ArrayList<Deck> gauntlet;
+    private Gauntlet atkGauntlet;
+    private Gauntlet defGauntlet;
     private final Deck playerDeck;
     private int numRuns = 150;
     private int numSims = 0;
@@ -46,9 +47,10 @@ public class Simulator {
         useMultiOpt = false;
     }
 
-    public Simulator(Deck playerDeck, ArrayList<Deck> gauntlet, BGOptions options) {
+    public Simulator(Deck playerDeck, Gauntlet atkGauntlet, Gauntlet defGauntlet, BGOptions options) {
         this.playerDeck = playerDeck;
-        this.gauntlet = gauntlet;
+        this.atkGauntlet = atkGauntlet;
+        this.defGauntlet = defGauntlet;
         this.options = options;
     }
 
@@ -68,7 +70,8 @@ public class Simulator {
         return new SimpleIntegerProperty(getDefenseCCS());
     }
 
-    public void setGauntlet(ArrayList<Deck> gauntlet) { this.gauntlet = gauntlet; }
+    public void setAttackGauntlet(Gauntlet gauntlet) { this.atkGauntlet = gauntlet; }
+    public void setDefenseGauntlet(Gauntlet gauntlet) { this.defGauntlet = gauntlet; }
     public void setOptions(BGOptions options) { this.options = options; }
 
     public void runSimulation(int n) {
@@ -80,18 +83,21 @@ public class Simulator {
         numRuns = n;
 
         if(!useMultiOpt) {
-            for (Deck gauntletDeck : gauntlet) {
-                Field fieldAttack = new Field(playerDeck, gauntletDeck, options.surge, numRuns);
-                fieldAttack.setBGOptions(options, true);
-                //executor.execute(fieldAttack);
-                taskList.add(Executors.callable(fieldAttack));
-                attackFields.add(fieldAttack);
-
-                Field fieldDefense = new Field(gauntletDeck, playerDeck, options.surge, numRuns);
-                fieldDefense.setBGOptions(options, false);
-                //executor.execute(fieldDefense);
-                taskList.add(Executors.callable(fieldDefense));
-                defenseFields.add(fieldDefense);
+            if(atkGauntlet != null) {
+                for (Deck gauntletDeck : atkGauntlet.getDeckList()) {
+                    Field fieldAttack = new Field(playerDeck, gauntletDeck, options.surge, numRuns);
+                    fieldAttack.setBGOptions(options, true);
+                    taskList.add(Executors.callable(fieldAttack));
+                    attackFields.add(fieldAttack);
+                }
+            }
+            if(defGauntlet != null) {
+                for (Deck gauntletDeck : defGauntlet.getDeckList()) {
+                    Field fieldDefense = new Field(gauntletDeck, playerDeck, options.surge, numRuns);
+                    fieldDefense.setBGOptions(options, false);
+                    taskList.add(Executors.callable(fieldDefense));
+                    defenseFields.add(fieldDefense);
+                }
             }
         } else {
             for(int i = 0; i < optionsList.size(); i++) {
@@ -102,20 +108,23 @@ public class Simulator {
                 bgopt.bgX = options.bgX;
 
                 double weight = weights.get(i);
-                for (Deck gauntletDeck : gauntlet) {
-                    Field fieldAttack = new Field(playerDeck, gauntletDeck, options.surge, numRuns);
-                    fieldAttack.setBGOptions(bgopt, true);
-                    fieldAttack.setWeight(weight);
-                    taskList.add(Executors.callable(fieldAttack));
-                    //executor.execute(fieldAttack);
-                    attackFields.add(fieldAttack);
-
-                    Field fieldDefense = new Field(gauntletDeck, playerDeck, options.surge, numRuns);
-                    fieldDefense.setBGOptions(bgopt, false);
-                    fieldAttack.setWeight(weight);
-                    taskList.add(Executors.callable(fieldDefense));
-                    //executor.execute(fieldDefense);
-                    defenseFields.add(fieldDefense);
+                if(atkGauntlet != null) {
+                    for (Deck gauntletDeck : atkGauntlet.getDeckList()) {
+                        Field fieldAttack = new Field(playerDeck, gauntletDeck, options.surge, numRuns);
+                        fieldAttack.setBGOptions(bgopt, true);
+                        fieldAttack.setWeight(weight);
+                        taskList.add(Executors.callable(fieldAttack));
+                        attackFields.add(fieldAttack);
+                    }
+                }
+                if(defGauntlet != null) {
+                    for (Deck gauntletDeck : defGauntlet.getDeckList()) {
+                        Field fieldDefense = new Field(gauntletDeck, playerDeck, options.surge, numRuns);
+                        fieldDefense.setBGOptions(bgopt, false);
+                        fieldDefense.setWeight(weight);
+                        taskList.add(Executors.callable(fieldDefense));
+                        defenseFields.add(fieldDefense);
+                    }
                 }
             }
         }
@@ -142,6 +151,8 @@ public class Simulator {
     }
 
     private int calcAttackCCS(List<Field> attackFields) {
+        if(attackFields.size() == 0) return 0;
+
         int numTotal = 0;
         int numWins = 0;
         int turnCount = 0;
@@ -162,6 +173,8 @@ public class Simulator {
     }
 
     private int calcDefenseCCS(List<Field> defenseFields) {
+        if(defenseFields.size() == 0) return 0;
+
         int numTotal = 0;
         int numWins = 0;
         int turnCount = 0;

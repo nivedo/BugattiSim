@@ -6,7 +6,7 @@ import java.util.*;
 
 public class DeckOptimizer {
 
-    private ArrayList<Deck> gauntlet;
+    private Gauntlet gauntlet;
     private ArrayList<Card> benchCards = new ArrayList<Card>();
     private HashMap<Card, ArrayList<Deck>> deckMap = new HashMap<Card, ArrayList<Deck>>();
     private Deck deck;
@@ -35,7 +35,7 @@ public class DeckOptimizer {
         return 200 / (useMultiOpt ? weights.size() : 1);
     }
 
-    public DeckOptimizer(Deck deck, ArrayList<Deck> gauntlet, BGOptions options) {
+    public DeckOptimizer(Deck deck, Gauntlet gauntlet, BGOptions options) {
         this.deck = deck;
         this.gauntlet = gauntlet;
         this.options = options;

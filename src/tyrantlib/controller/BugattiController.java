@@ -2,9 +2,6 @@ package tyrantlib.controller;
 
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
-import javafx.stage.Modality;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -17,7 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.concurrent.Task;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
@@ -35,17 +31,17 @@ import javax.crypto.spec.DESKeySpec;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Jay on 9/9/2014.
  */
 public class BugattiController {
 
-    public static final String VERSION = "6.0.1";
+    public static final String VERSION = "6.0.3";
 
     public Gauntlet gauntlet = new Gauntlet();
-    public Gauntlet gwGauntlet = new Gauntlet();
+    public Gauntlet gwAttackGauntlet = new Gauntlet();
+    public Gauntlet gwDefenseGauntlet = new Gauntlet();
 
     public ArrayList<String> eventNames = new ArrayList<String>();
     public ArrayList<Gauntlet> eventGauntlets = new ArrayList<Gauntlet>();
@@ -201,7 +197,7 @@ public class BugattiController {
                 String deckCards = split[1].replace('\n',',').trim();
                 try {
                     Deck newDeck = new Deck(commander, deckCards);
-                    mainApp.getObsDeckList().add(new Simulator(newDeck,gauntlet.getDeckList(),new BGOptions()));
+                    mainApp.getObsDeckList().add(new Simulator(newDeck,null,null,new BGOptions()));
                     deckEntryArea.setText("");
                 }
                 catch (RuntimeException e) {
@@ -231,7 +227,7 @@ public class BugattiController {
                 dl.load(file.getAbsolutePath());
                 mainApp.getObsDeckList().clear();
                 for(Deck deck : dl.getDeckList()) {
-                    mainApp.getObsDeckList().add(new Simulator(deck, gauntlet.getDeckList(), new BGOptions()));
+                    mainApp.getObsDeckList().add(new Simulator(deck,null,null,new BGOptions()));
                 }
             }
         });
@@ -267,7 +263,8 @@ public class BugattiController {
         });
 
         runButton.setOnAction((event) -> {
-            Gauntlet activeGauntlet = getActiveGauntlet();
+            Gauntlet attackGauntlet = getAttackGauntlet();
+            Gauntlet defenseGauntlet = getDefenseGauntlet();
             BGOptions options = getBGOptions();
             setMultiOptions();
 
@@ -275,10 +272,12 @@ public class BugattiController {
 
             Task task = new Task() {
                 @Override public Void call() {
-                    int numRuns = getNumRuns(activeGauntlet.getDeckList().size());
+                    // HACK: always calculates runs based on attack gauntlet size (since def can be null)
+                    int numRuns = getNumRuns(attackGauntlet.getDeckList().size());
 
                     for (Simulator sim : mainApp.getObsDeckList()) {
-                        sim.setGauntlet(activeGauntlet.getDeckList());
+                        sim.setAttackGauntlet(attackGauntlet);
+                        sim.setDefenseGauntlet(defenseGauntlet);
                         sim.setOptions(options);
                         if(useMultiOptions) {
                             sim.setMultiOptions(optionsList, weights);
@@ -313,13 +312,15 @@ public class BugattiController {
             int index = deckTable.getSelectionModel().getSelectedIndex();
             if(index >= 0) {
                 Deck selectedDeck = mainApp.getObsDeckList().get(index).getPlayerDeck();
-                Gauntlet activeGauntlet = getActiveGauntlet();
                 BGOptions options = getBGOptions();
                 BGOptions simOptions = getBGOptions();
                 setMultiOptions();
 
                 boolean isOptOrder = optOrderRadio.isSelected();
-                String modeStr = (String) modeBox.getSelectionModel().getSelectedItem();
+                Gauntlet attackGauntlet = getAttackGauntlet();
+                Gauntlet defenseGauntlet = getDefenseGauntlet();
+                Gauntlet optimizeGauntlet = isOptOrder ? attackGauntlet : defenseGauntlet;
+                //String modeStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
                 if(!benchArea.isDisabled()) {
                     if(!checkBench()) { return; }
@@ -329,7 +330,7 @@ public class BugattiController {
 
                 Task task = new Task<Simulator>() {
                     @Override public Simulator call() {
-                        DeckOptimizer optimizer = new DeckOptimizer(selectedDeck, activeGauntlet.getDeckList(), options);
+                        DeckOptimizer optimizer = new DeckOptimizer(selectedDeck, optimizeGauntlet, options);
                         if(useMultiOptions) optimizer.setMultiOptions(optionsList, weights);
 
                         Deck optimizedDeck;
@@ -337,7 +338,7 @@ public class BugattiController {
                         for (Card card : benchCards) {
                             optimizer.addCardToBench(card);
                         }
-                        optimizedDeck = optimizer.optimizeClimb(isOptOrder, getNumRuns(activeGauntlet.getDeckList().size()));
+                        optimizedDeck = optimizer.optimizeClimb(isOptOrder, getNumRuns(optimizeGauntlet.size()));
 
                         /*
                         if(isOptOrder) {
@@ -353,14 +354,14 @@ public class BugattiController {
                         */
 
                         // Add new deck to deck list
-                        Simulator sim = new Simulator(optimizedDeck,activeGauntlet.getDeckList(),simOptions);
+                        Simulator sim = new Simulator(optimizedDeck,attackGauntlet,defenseGauntlet,simOptions);
                         if(useMultiOptions) {
                             sim.setMultiOptions(optionsList, weights);
                         } else {
                             sim.clearMultiOptions();
                         }
 
-                        int numRuns = getNumRuns(activeGauntlet.getDeckList().size());
+                        int numRuns = getNumRuns(attackGauntlet.size());
                         sim.runSimulation(numRuns);
 
                         return sim;
@@ -511,42 +512,15 @@ public class BugattiController {
         CardHandler handler = CardHandler.getInstance();
 
         try {
-            FileInputStream input = new FileInputStream(new File("ccs6.des"));
+            // Main CCS 6 gauntlet
+            gauntlet.loadEncrypted("ccs6.des");
+            gwAttackGauntlet.loadEncrypted("gw_atk.des");
+            gwDefenseGauntlet.loadEncrypted("gw_def.des");
 
-            String myEncryptionKey = "CrazyAwesome";
-            DESKeySpec dks = new DESKeySpec(myEncryptionKey.getBytes());
-            SecretKey myDesKey = SecretKeyFactory.getInstance("DES").generateSecret(dks);
-            Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-
-            desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
-            CipherInputStream cipheris = new CipherInputStream(input, desCipher);
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(cipheris));
-            String line;
+            // Custom loading for event gauntlets
+            BufferedReader br = new BufferedReader(new FileReader("events.decklist"));
+            String line = "";
             while ((line = br.readLine()) != null) {
-                String arr[] = line.trim().split(",", 2);
-                if (arr.length == 2) {
-                    Deck deck = new Deck(arr[0], arr[1]);
-                    gauntlet.getDeckList().add(deck);
-                }
-            }
-
-            FileInputStream input2 = new FileInputStream(new File("ccs6.des"));
-            desCipher.init(Cipher.DECRYPT_MODE, myDesKey);
-            cipheris = new CipherInputStream(input2, desCipher);
-
-            br = new BufferedReader(new InputStreamReader(cipheris));
-            while ((line = br.readLine()) != null) {
-                String arr[] = line.trim().split(",", 2);
-                if (arr.length == 2) {
-                    Deck deck = new Deck(arr[0], arr[1]);
-                    gwGauntlet.getDeckList().add(deck);
-                }
-            }
-
-            BufferedReader br2 = new BufferedReader(new FileReader("events.decklist"));
-            line = "";
-            while ((line = br2.readLine()) != null) {
                 String split[] = line.split("\\|");
                 if(split.length == 2) {
                     eventNames.add("Event - " + split[0]);
@@ -566,14 +540,28 @@ public class BugattiController {
         }
     }
 
-    public Gauntlet getActiveGauntlet() {
+    public Gauntlet getAttackGauntlet() {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
-        if (selectedStr.toLowerCase().contains("ccs") || selectedStr.toLowerCase().contains("guild war")) {
-            return gwGauntlet;
+        if (selectedStr.toLowerCase().contains("guild war")) {
+            return gwAttackGauntlet;
         }
         else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
             return eventGauntlets.get(modeBox.getSelectionModel().getSelectedIndex() - 3);
+        }
+
+        return gauntlet;
+    }
+
+    public Gauntlet getDefenseGauntlet() {
+        String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
+
+        if (selectedStr.toLowerCase().contains("guild war")) {
+            return gwDefenseGauntlet;
+        }
+        else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
+            // Return no defensive gauntlet for events
+            return null;
         }
 
         return gauntlet;
@@ -639,9 +627,6 @@ public class BugattiController {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
         if(selectedStr.toLowerCase().contains("event")) {
             options.surge = false;
-        }
-        if(selectedStr.toLowerCase().contains("ccsd")) {
-            options.isAttack = false;
         }
         if(selectedStr.toLowerCase().contains("brawl")) {
             options.isBrawlMode = true;

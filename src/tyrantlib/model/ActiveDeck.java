@@ -72,6 +72,9 @@ public class ActiveDeck {
 
     public void setBGEffect(BGOptions options) {
         bgEffect = new Skill();
+        progEffect = false;
+        reapEffect = false;
+
         if(options.bgEffect==SkillType.PROGENITOR) {
             progEffect = true;
         }
