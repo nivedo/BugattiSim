@@ -53,7 +53,7 @@ public class SimulatorV2 {
                 } else {
                     field = new Field(gauntletDeck, playerDeck, options.surge, numRuns);
                 }
-                field.setBGOptions(options, true);
+                field.setBGOptions(options, options.isAttack);
                 taskList.add(Executors.callable(field));
                 fieldList.add(field);
             }
@@ -73,7 +73,7 @@ public class SimulatorV2 {
                     } else {
                         field = new Field(gauntletDeck, playerDeck, bgopt.surge, numRuns);
                     }
-                    field.setBGOptions(bgopt, true);
+                    field.setBGOptions(bgopt, options.isAttack);
                     field.setWeight(weight);
                     taskList.add(Executors.callable(field));
                     fieldList.add(field);
