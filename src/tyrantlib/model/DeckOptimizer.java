@@ -54,6 +54,7 @@ public class DeckOptimizer {
         //simulator.runSimulation(1000);
 
         ArrayList<Integer> spamScores = new ArrayList<Integer>();
+        ArrayList<Boolean> inDeck = new ArrayList<>();
 
         for(Card card : deck.getCards()) {
             if(card != null) benchCards.add(card);
@@ -64,7 +65,6 @@ public class DeckOptimizer {
             if(useMultiOpt) sim.setMultiOptions(optionsList, weights);
             sim.runSimulation(numRuns);
             spamScores.add(sim.getScore());
-
             //System.out.println(bcard.getName() + " : " + sim.getScore());
         }
 
@@ -112,9 +112,9 @@ public class DeckOptimizer {
                         if (k > 0) newDeckString += ",";
                         newDeckString += deckString;
                     }
-                    //System.out.println(newDeckString);
 
                     //System.out.println(newDeckString);
+
                     tempDeck = new Deck(deck.getCommander().getName(), newDeckString);
                     simulator = new SimulatorV2(tempDeck, gauntlet, options);
                     if (useMultiOpt) simulator.setMultiOptions(optionsList, weights);

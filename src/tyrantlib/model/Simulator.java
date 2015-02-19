@@ -163,12 +163,12 @@ public class Simulator {
             turnCount += (f.getTotalTurns() * f.getWeight());
             unitsKilled += (f.getUnitsKilled() * f.getWeight());
         }
-
+        /*
         if(options.isBrawlMode) {
             double expectedScore = 1.0 * numWins / numTotal * (50.0 + (2.0 * unitsKilled - 0.5 * turnCount) / numWins) + 5.0 * (numTotal - numWins) / numTotal;
             return (int) (1000 * expectedScore / 60.0);
         }
-
+        */
         return (int)(1000.0 * numWins / numTotal);
     }
 
@@ -185,12 +185,12 @@ public class Simulator {
             turnCount += (f.getTotalTurns() * f.getWeight());
             unitsKilled += (f.getUnitsKilled() * f.getWeight());
         }
-
+        /*
         if(options.isBrawlMode) {
             double expectedScore = 1.0 * numWins / numTotal * (50.0 + (2.0 * unitsKilled - 0.5 * turnCount) / numWins) + 5.0 * (numTotal - numWins) / numTotal;
             return (int) (1000 * (1 - expectedScore / 60.0));
         }
-
+        */
         /*
         double expectedScore = 1.0 * numWins / numTotal * (80.0 - 1.0 * turnCount / numWins) + 5.0 * (numTotal - numWins) / numTotal;
 

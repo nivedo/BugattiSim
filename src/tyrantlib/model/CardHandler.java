@@ -206,6 +206,7 @@ public class CardHandler extends DefaultHandler{
                 card.setType(f);
             }
             else if (activeName.equals("set"))    {
+                if(strval.isEmpty()) { strval = "2000"; }
                 cardWrapper.setSet(Integer.parseInt(strval));
                 card.setSet(Integer.parseInt(strval));
             }

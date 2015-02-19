@@ -57,4 +57,196 @@
 		<type>5</type>
 		<set>5555</set>
 	</unit>
+
+	<unit>
+		<id>50006</id>
+		<name>Forsaken Outrider No Legion</name>
+		<picture>wheely</picture>
+		<attack>8</attack>
+		<health>14</health>
+		<cost>3</cost>
+		<rarity>5</rarity>
+		<type>2</type>
+		<set>6000</set>
+		<skill id='corrosive' x='4' />
+		<skill id='strike' x='3' />
+		<skill id='legion' x='2' />
+		<upgrade>
+			<level>2</level>
+			<card_id>12082</card_id>
+			<health>16</health>
+			<skill id='corrosive' x='5' />
+			<skill id='strike' x='3' />
+			<skill id='legion' x='3' />
+			<attack>10</attack>
+		</upgrade>
+		<upgrade>
+			<level>3</level>
+			<card_id>12083</card_id>
+			<health>19</health>
+			<skill id='corrosive' x='6' />
+			<skill id='strike' x='3' all='1' />
+			<skill id='legion' x='3' />
+		</upgrade>
+		<upgrade>
+			<level>4</level>
+			<card_id>12084</card_id>
+			<health>23</health>
+			<skill id='heal' x='4' all='1' />
+			<skill id='strike' x='4' all='1' />
+			<skill id='legion' x='4' />
+			<attack>12</attack>
+		</upgrade>
+		<upgrade>
+			<level>5</level>
+			<card_id>12085</card_id>
+			<health>28</health>
+			<attack>13</attack>
+			<skill id='heal' x='5' all='1' y='2' />
+			<skill id='strike' x='4' all='1' />
+			<skill id='legion' x='4' />
+		</upgrade>
+		<upgrade>
+			<level>6</level>
+			<card_id>12086</card_id>
+			<health>32</health>
+			<skill id='heal' x='5' all='1' y='2' />
+			<skill id='strike' x='5' all='1' />
+			<skill id='legion' x='4' />
+		</upgrade>
+		<upgrade>
+			<level>7</level>
+			<card_id>12087</card_id>
+			<health>36</health>
+			<skill id='heal' x='5' all='1' y='2' />
+			<skill id='enfeeble' x='6' />
+			<skill id='legion' x='4' />
+		</upgrade>
+		<upgrade>
+			<level>8</level>
+			<card_id>12088</card_id>
+			<health>40</health>
+			<skill id='heal' x='6' all='1' y='2' />
+			<skill id='enfeeble' x='7' />
+			<skill id='legion' x='5' />
+			<attack>15</attack>
+		</upgrade>
+		<upgrade>
+			<level>9</level>
+			<card_id>12089</card_id>
+			<health>43</health>
+			<skill id='heal' x='6' all='1' y='2' />
+			<skill id='enfeeble' x='8' />
+			<skill id='legion' x='5' />
+			<attack>15</attack>
+		</upgrade>
+		<upgrade>
+			<level>10</level>
+			<card_id>12090</card_id>
+			<attack>6</attack>
+			<health>46</health>
+			<skill id='heal' x='7' all='1' y='2' />
+			<skill id='enfeeble' x='9' />
+			<skill id='legion' x='5' />
+			<attack>16</attack>
+		</upgrade>
+	</unit>
+
+	<unit>
+		<id>50007</id>
+		<name>Lord Silus Cmd</name>
+		<picture>raidercommander1</picture>
+		<asset_bundle>108</asset_bundle>
+		<health>17</health>
+		<rarity>4</rarity>
+		<skill id='enhance' s='armored' x='1' />
+		<skill id='protect' x='1' y='2' />
+		<type>2</type>
+		<set>7000</set>
+		<upgrade>
+			<level>2</level>
+			<card_id>1494</card_id>
+			<health>21</health>
+		</upgrade>
+		<upgrade>
+			<level>3</level>
+			<card_id>1495</card_id>
+			<picture>lordsilus_lv3</picture>
+			<asset_bundle>0</asset_bundle>
+			<skill id='enhance' s='armored' x='1' />
+			<skill id='overload' n='1' y='2' />
+			<skill id='protect' x='1' y='2' />
+			<health>26</health>
+		</upgrade>
+		<upgrade>
+			<level>4</level>
+			<card_id>1496</card_id>
+			<skill id='enhance' s='armored' x='1' all='1' />
+			<skill id='overload' n='1' y='2' />
+			<skill id='protect' x='1' y='2' />
+			<health>32</health>
+		</upgrade>
+		<upgrade>
+			<level>5</level>
+			<card_id>1497</card_id>
+			<health>39</health>
+		</upgrade>
+		<upgrade>
+			<level>6</level>
+			<card_id>1498</card_id>
+			<picture>lordsilus_lv6</picture>
+			<skill id='enhance' s='armored' x='1' all='1' />
+			<skill id='overload' n='1' y='2' />
+			<skill id='protect' x='1' y='2' all='1' />
+			<health>48</health>
+		</upgrade>
+	</unit>
+	
+	<unit>
+		<id>51035</id>
+		<name>Brood Mother Cmd</name>
+		<picture>broodqueen.jpg</picture>
+		<attack>0</attack>
+		<health>13</health>
+		<rarity>3</rarity>
+		<type>3</type>
+		<skill id="weaken" x="1"/>
+		<set>7000</set>
+		<upgrade>
+			<level>2</level>
+			<card_id>51036</card_id>
+			<skill id="rally" x="1" y="3"/>
+			<skill id="weaken" x="1"/>
+			<health>17</health>
+		</upgrade>
+		<upgrade>
+			<level>3</level>
+			<picture>broodqueenlv3.jpg</picture>
+			<card_id>51037</card_id>
+			<health>21</health>
+		</upgrade>
+		<upgrade>
+			<level>4</level>
+			<card_id>51038</card_id>
+			<skill id="enhance" s="leech" x="1"/>
+			<skill id="rally" x="1" y="3"/>
+			<skill id="weaken" x="2"/>
+			<health>25</health>
+		</upgrade>
+		<upgrade>
+			<level>5</level>
+			<card_id>51039</card_id>
+			<health>31</health>
+		</upgrade>
+		<upgrade>
+			<level>6</level>
+			<card_id>51040</card_id>
+			<picture>broodqueenlv6.jpg</picture>
+			<skill id="enhance" s="leech" x="1"/>
+			<skill id="rally" x="1" all="1" y="3"/>
+			<skill id="weaken" x="2"/>
+			<health>37</health>
+		</upgrade>
+	</unit>
+	
 </root>

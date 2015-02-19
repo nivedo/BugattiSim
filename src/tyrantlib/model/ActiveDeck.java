@@ -50,6 +50,9 @@ public class ActiveDeck {
     private boolean reapEffect;
     private Skill reapHeal;
     private Skill reapRally;
+    private boolean bloodlustEffect;
+    private int bloodlustN;
+    private boolean metaEffect;
 
     public ActiveDeck( Deck deck ) {
         this.deck = deck;
@@ -74,6 +77,8 @@ public class ActiveDeck {
         bgEffect = new Skill();
         progEffect = false;
         reapEffect = false;
+        bloodlustEffect = false;
+        metaEffect = false;
 
         if(options.bgEffect==SkillType.PROGENITOR) {
             progEffect = true;
@@ -92,6 +97,13 @@ public class ActiveDeck {
                 reapRally.all = true;
                 reapRally.x = options.bgX;
             }
+        }
+        else if(options.bgEffect==SkillType.BLOODLUST) {
+            bloodlustEffect = true;
+            bloodlustN = options.bgX;
+        }
+        else if(options.bgEffect==SkillType.METAMORPHOSIS) {
+            metaEffect = true;
         }
         else if (!options.isEnhance) {
             bgEffect.setId(options.bgEffect);
@@ -167,11 +179,27 @@ public class ActiveDeck {
         return false;
     }
 
+    public boolean isMetamorphosis() {
+        return metaEffect;
+    }
+
     public void onUnitDeath() {
         // Special BGE
         if(reapEffect) {
             applySkill(null, reapHeal, this);
             applySkill(null, reapRally, this);
+        }
+    }
+
+    public void onAttackDamage(ActiveCard attackCard) {
+        // Special BGE
+        if(bloodlustEffect && !attackCard.bloodlust) {
+            for(ActiveCard card : assaults) {
+                if (card.canAct()) {
+                    card.applyBloodlust(bloodlustN);
+                }
+            }
+            attackCard.bloodlust = true;
         }
     }
 
@@ -351,6 +379,12 @@ public class ActiveDeck {
                 applyAllSkills(card, enemyDeck);
             }
 
+            // Flurry
+            if(card.canAct() && card.flurryActive()) {
+                applyAllSkills(card, enemyDeck);
+                card.hasFlurried = true;
+            }
+
             card.acted = true;
         }
     }
@@ -362,7 +396,15 @@ public class ActiveDeck {
             if(card.canAct()) {
                 ActiveCard opCard = null;
                 if(i < enemyDeck.assaults.size()) { opCard = enemyDeck.assaults.get(i); }
-                card.preCombat(opCard);
+                card.checkValor(opCard);
+
+                // Check Legion
+                if(i > 0 && assaults.get(i-1).getType() == card.getType()) {
+                    card.applyLegion();
+                }
+                if(i < (assaults.size() - 1) && assaults.get(i+1).getType() == card.getType()) {
+                    card.applyLegion();
+                }
             }
         }
     }
@@ -378,12 +420,12 @@ public class ActiveDeck {
 
             if(card.canAct()) {
                 applyAllSkills(card, enemyDeck);
-                doAttack(i, enemyDeck);
+                if(card.canAct()) doAttack(i, enemyDeck);
 
                 // Flurry
                 if(card.canAct() && card.flurryActive()) {
                     applyAllSkills(card, enemyDeck);
-                    doAttack(i, enemyDeck);
+                    if(card.canAct()) doAttack(i, enemyDeck);
                     card.hasFlurried = true;
                 }
             }
@@ -430,7 +472,7 @@ public class ActiveDeck {
 
     public void applyAllSkills(ActiveCard card, ActiveDeck enemyDeck) {
         for(Skill s : card.getSkills()) {
-            if(s != null) { applySkill(card, s, enemyDeck); }
+            if(card.canAct() && s != null) { applySkill(card, s, enemyDeck); }
         }
     }
 
@@ -454,11 +496,11 @@ public class ActiveDeck {
                     if (skill.all) {
                         targets = enemyDeck.getTargets();
                         for (int i = 0; i < enemyDeck.getNumTargets(); i++) {
-                            targets[i].doEnfeeble(skill.x + enhanceVal, overloaded);
+                            targets[i].doEnfeeble(skill.x + enhanceVal, overloaded, card);
                         }
                     } else {
                         target = enemyDeck.getRandomTarget();
-                        target.doEnfeeble(skill.x + enhanceVal, overloaded);
+                        target.doEnfeeble(skill.x + enhanceVal, overloaded, card);
                     }
                 }
 
@@ -534,11 +576,11 @@ public class ActiveDeck {
                     if (skill.all) {
                         targets = enemyDeck.getTargets();
                         for (int i = 0; i < enemyDeck.getNumTargets(); i++) {
-                            targets[i].doStrike(skill.x + enhanceVal, overloaded);
+                            targets[i].doStrike(skill.x + enhanceVal, overloaded, card);
                         }
                     } else {
                         target = enemyDeck.getRandomTarget();
-                        target.doStrike(skill.x + enhanceVal, overloaded);
+                        target.doStrike(skill.x + enhanceVal, overloaded, card);
                     }
                 }
 
@@ -550,11 +592,11 @@ public class ActiveDeck {
                     if (skill.all) {
                         targets = enemyDeck.getTargets();
                         for (int i = 0; i < enemyDeck.getNumTargets(); i++) {
-                            targets[i].doWeaken(skill.x + enhanceVal, overloaded);
+                            targets[i].doWeaken(skill.x + enhanceVal, overloaded, card);
                         }
                     } else {
                         target = enemyDeck.getRandomTarget();
-                        target.doWeaken(skill.x + enhanceVal, overloaded);
+                        target.doWeaken(skill.x + enhanceVal, overloaded, card);
                     }
                 }
 
@@ -569,13 +611,13 @@ public class ActiveDeck {
                         if (skill.all) {
                             targets = enemyDeck.getTargets();
                             for (int i = 0; i < enemyDeck.getNumTargets(); i++) {
-                                if (targets[i].doJam(overloaded)) {
+                                if (targets[i].doJam(overloaded, card)) {
                                     card.hasJammed = true;
                                 }
                             }
                         } else {
                             target = enemyDeck.getRandomTarget();
-                            if (target.doJam(overloaded)) {
+                            if (target.doJam(overloaded, card)) {
                                 card.hasJammed = true;
                             }
                         }

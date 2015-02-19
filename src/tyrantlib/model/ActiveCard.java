@@ -44,6 +44,8 @@ public class ActiveCard {
     // Passive skills and modifiers
     protected int evade;
     protected int evadedNum = 0; // Skills evaded this turn
+    protected int payback;
+    protected int paybackNum = 0;
     protected int armored;
     protected int counter;
     protected int corrosive;
@@ -59,6 +61,10 @@ public class ActiveCard {
     protected int valor;
     protected int valorNum = 0;
     protected boolean valorActive = false;
+    protected int legion = 0;
+    protected int legionNum = 0;
+    protected boolean bloodlust = false;
+    protected int bloodlustNum = 0;
     protected int berserk;
     protected int berserkNum = 0; // Total berserk benefit
     protected int leech;
@@ -81,13 +87,14 @@ public class ActiveCard {
         }
 
         // Passive skills and modifiers
-        evade = evadedNum = armored = counter = corrosive = corroded = corrodedNum = flurry = flurryCD = 0;
+        evade = evadedNum = payback = paybackNum = armored = counter = corrosive = corroded = corrodedNum = flurry = flurryCD = 0;
         wall = hasFlurried = false;
 
         // Attack skills and modifiers
-        pierce = valor = valorNum = berserk = berserkNum =
+        pierce = valor = valorNum = legion = legionNum = bloodlustNum = berserk = berserkNum =
                 leech = poison = poisoned = inhibit = inhibited = inhibitedNum = 0;
         valorActive = false;
+        bloodlust = false;
 
         attack = card.getAttack();
         health = card.getHealth();
@@ -158,11 +165,18 @@ public class ActiveCard {
     }
 
     public boolean matchesType(Faction type) {
-        return (getType() == type || getType() == Faction.PROGENITOR || type == Faction.NOTYPE );
+        return (getType() == type || getType() == Faction.PROGENITOR || type == Faction.NOTYPE || deck.isMetamorphosis());
     }
 
     public boolean canEnfeeble() { return !isDead(); }
-    public void doEnfeeble(int x, boolean overload) { if(overload || !evaded()) enfeeble += x; }
+    public void doEnfeeble(int x, boolean overload, ActiveCard assault) {
+        if(overload || !evaded()) {
+            enfeeble += x;
+            if(assault != null && paybackNum++ < payback) {
+                assault.doEnfeeble(x, true, null);
+            }
+        }
+    }
 
     public boolean canHeal() { return !isDead() && (health < card.getHealth()); }
     public void doHeal(int x, boolean overload) { if(overload || !inhibited()) addHealth(x); }
@@ -177,19 +191,35 @@ public class ActiveCard {
     public void doSiege(int x, boolean overload) { if(overload || !evaded()) { removeHealth(x); } }
 
     public boolean canStrike() { return !isDead(); }
-    public void doStrike(int x, boolean overload) {
+    public void doStrike(int x, boolean overload, ActiveCard assault) {
         if(overload || !evaded()) {
             int strikeDamage = x + enfeeble - (overload ? 0 : protect);
             if(strikeDamage > 0) { removeHealth(strikeDamage); }
+            if(assault != null && paybackNum++ < payback) {
+                assault.doStrike(x, true, null);
+            }
         }
     }
 
     public boolean canWeaken() { return canAct() && (getEffectiveAttack() > 0); }
-    public void doWeaken(int x, boolean overload) { if(overload || !evaded()) weaken += x; }
+    public void doWeaken(int x, boolean overload, ActiveCard assault) {
+        if(overload || !evaded()) {
+            weaken += x;
+            if(assault != null && paybackNum++ < payback) {
+                assault.doWeaken(x, true, null);
+            }
+        }
+    }
 
     // Jam returns TRUE if jam was successful
     public boolean canJam() { return canAct(); }
-    public boolean doJam(boolean overload) { return (jammed = (overload || !evaded())); }
+    public boolean doJam(boolean overload, ActiveCard assault) {
+        jammed = (overload || !evaded());
+        if(assault != null && jammed && paybackNum++ < payback) {
+            assault.doJam(true, null);
+        }
+        return jammed;
+    }
 
     public boolean canEnhance(SkillType skillId) {
         Skill s = card.getSkillByIndex(skillId);
@@ -201,7 +231,7 @@ public class ActiveCard {
 
     // Proposed new skill
     public boolean canOverload(boolean hasInhibit) { return canAct() && !acted && !overloaded &&
-            (overloadTarget || (overloadInhibit && hasInhibit)); }
+            (overloadTarget || jamActive() || (overloadInhibit && hasInhibit)); }
     public void doOverload() { if(!inhibited()) overloaded = true; }
 
     // PHASE CALLBACKS
@@ -213,13 +243,11 @@ public class ActiveCard {
         }
         enfeeble = protect = 0;
         evadedNum = 0;
+        paybackNum = 0;
         overloaded = false;
     }
 
     public void endPhase() {
-        rally = weaken = inhibited = inhibitedNum = 0;
-        jammed = false;
-
         // Set Jam cooldowns
         if(hasJammed) {
             jamCD = jam;
@@ -234,7 +262,7 @@ public class ActiveCard {
 
         // Take poison damage
         if(poisoned > 0) {
-            int poisonDamage = poisoned - protect;
+            int poisonDamage = poisoned - protect + enfeeble;
             if(poisonDamage > 0 && health > 0) {
                 removeHealth(poisonDamage);
             }
@@ -254,6 +282,11 @@ public class ActiveCard {
                 }
             }
         }
+
+        // Reset vars
+        rally = weaken = enfeeble = inhibited = inhibitedNum = legionNum = bloodlustNum = 0;
+        jammed = false;
+        bloodlust = false;
 
         // Reset flags
         attacked = false;
@@ -275,13 +308,16 @@ public class ActiveCard {
     }
     */
 
-    public void preCombat(ActiveCard opposingCard) {
+    public void checkValor(ActiveCard opposingCard) {
         // Apply Valor on first activation
         if(opposingCard != null && !valorActive && opposingCard.isAssault() && getEffectiveAttack() < opposingCard.getEffectiveAttack()) {
             valorNum += valor;
         }
         valorActive = true;
     }
+
+    public void applyLegion() { legionNum += legion; }
+    public void applyBloodlust(int n) { bloodlustNum += n; }
 
     // Attacks an enemy unit (assault > wall > commander)
     public void attack(ActiveCard targetCard) {
@@ -298,15 +334,17 @@ public class ActiveCard {
             int totalProtect = targetCard.protect + targetCard.armored - pierce;
             if (totalProtect < 0) totalProtect = 0;
 
-            totalDamage = totalDamage - totalProtect + targetCard.enfeeble;
+            totalDamage = totalDamage - totalProtect + targetCard.enfeeble + legionNum + bloodlustNum;
 
             if (totalDamage > 0 && targetCard.health > 0) {
                 targetCard.removeHealth(totalDamage);
                 dealtDamage = true;
 
+                deck.onAttackDamage(this);
+
                 // Apply counter damage first
                 if (targetCard.counter > 0) {
-                    int counterDamage = targetCard.counter - protect;
+                    int counterDamage = targetCard.counter - protect + enfeeble;
                     if(counterDamage > 0 && health > 0) {
                         removeHealth(counterDamage);
                     }
@@ -340,6 +378,8 @@ public class ActiveCard {
             int enhanceVal = enhanceX[s.id.ordinal()];
             if (s.id == SkillType.EVADE) {
                 evade = s.x + enhanceVal;
+            } else if (s.id == SkillType.PAYBACK) {
+                payback = s.x + enhanceVal;
             } else if (s.id == SkillType.ARMORED) {
                 armored = s.x + enhanceVal;
             } else if (s.id == SkillType.COUNTER) {
@@ -354,6 +394,8 @@ public class ActiveCard {
                 pierce = s.x + enhanceVal;
             } else if (s.id == SkillType.VALOR) {
                 valor = s.x + enhanceVal;
+            } else if (s.id == SkillType.LEGION) {
+                legion = s.x + enhanceVal;
             } else if (s.id == SkillType.BERSERK) {
                 berserk = s.x + enhanceVal;
             } else if (s.id == SkillType.LEECH) {
@@ -364,7 +406,6 @@ public class ActiveCard {
                 inhibit = s.x + enhanceVal;
             } else if (s.id == SkillType.JAM) {
                 jam = s.c - enhanceVal;
-                overloadTarget = true;
             } else if (s.id == SkillType.SIEGE || s.id == SkillType.ENFEEBLE ||
                     s.id == SkillType.STRIKE || s.id == SkillType.WEAKEN) {
                 overloadTarget = true;

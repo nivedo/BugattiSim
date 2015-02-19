@@ -37,7 +37,7 @@ import java.util.Collections;
  */
 public class BugattiController {
 
-    public static final String VERSION = "6.0.3";
+    public static final String VERSION = "7.1.0";
 
     public Gauntlet gauntlet = new Gauntlet();
     public Gauntlet gwAttackGauntlet = new Gauntlet();
@@ -339,7 +339,7 @@ public class BugattiController {
                             optimizer.addCardToBench(card);
                         }
                         optimizedDeck = optimizer.optimizeClimb(isOptOrder, getNumRuns(optimizeGauntlet.size()));
-
+                        //optimizedDeck = optimizer.optimize(5);
                         /*
                         if(isOptOrder) {
                             if(modeStr.toLowerCase().contains("event")) {
@@ -389,7 +389,7 @@ public class BugattiController {
 
     private void initializeComboBoxes() {
         // Initialize Mode Box
-        modeBox.getItems().addAll("CCS 6.0","Brawl Mode","Guild War");
+        modeBox.getItems().addAll("CCS 7.0","Brawl Mode","Guild War");
         modeBox.getItems().addAll(eventNames);
         modeBox.getSelectionModel().select(0);
 
@@ -403,19 +403,16 @@ public class BugattiController {
                     skillTypes.add("Enhance All " + skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
                 }
             }
-            if(stype == SkillType.PROGENITOR || stype == SkillType.REAPING || SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
+            if(stype == SkillType.PROGENITOR || stype == SkillType.REAPING || stype == SkillType.BLOODLUST || stype == SkillType.METAMORPHOSIS || SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
                 switch(stype) {
                     case PROGENITOR:
+                    case METAMORPHOSIS:
                         skillName = stype.name();
                         skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " 1");
                         break;
                     case OVERLOAD:
-                        skillName = stype.name();
-                        for (int i = 1; i <= 3; i++) {
-                            skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
-                        }
-                        break;
                     case REAPING:
+                    case BLOODLUST:
                         skillName = stype.name();
                         for (int i = 1; i <= 3; i++) {
                             skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
@@ -513,9 +510,9 @@ public class BugattiController {
 
         try {
             // Main CCS 6 gauntlet
-            gauntlet.loadEncrypted("ccs6.des");
-            gwAttackGauntlet.loadEncrypted("gw_atk.des");
-            gwDefenseGauntlet.loadEncrypted("gw_def.des");
+            //gauntlet.loadEncrypted("ccs7.des");
+            gwAttackGauntlet.loadEncrypted("ccs7_attack.des");
+            gwDefenseGauntlet.loadEncrypted("ccs7_defense.des");
 
             // Custom loading for event gauntlets
             BufferedReader br = new BufferedReader(new FileReader("events.decklist"));
@@ -543,7 +540,7 @@ public class BugattiController {
     public Gauntlet getAttackGauntlet() {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
-        if (selectedStr.toLowerCase().contains("guild war")) {
+        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 3) {
             return gwAttackGauntlet;
         }
         else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
@@ -556,7 +553,7 @@ public class BugattiController {
     public Gauntlet getDefenseGauntlet() {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
-        if (selectedStr.toLowerCase().contains("guild war")) {
+        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 3) {
             return gwDefenseGauntlet;
         }
         else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
@@ -637,7 +634,7 @@ public class BugattiController {
 
     public int getNumRuns(int gSize) {
         int numRuns = 30000 / gSize / (useMultiOptions ? weights.size() : 1);
-        if(numRuns > 1000) numRuns = 1000;
+        if(numRuns > 4000) numRuns = 4000;
 
         return numRuns;
     }

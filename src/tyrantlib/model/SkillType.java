@@ -10,7 +10,7 @@ public enum SkillType {
     ENFEEBLE, HEAL, PROTECT, RALLY, SIEGE, STRIKE, WEAKEN, JAM, ENHANCE,
     PIERCE, BERSERK, LEECH, POISON, INHIBIT,
     EVADE, ARMORED, COUNTER, CORROSIVE, WALL, FLURRY,
-    OVERLOAD, VALOR, PROGENITOR, REAPING, UNKNOWN;
+    OVERLOAD, VALOR, LEGION, PAYBACK, PROGENITOR, REAPING, BLOODLUST, METAMORPHOSIS, UNKNOWN;
 
     // Activated Abilities
     public static final Set<SkillType> ACTIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
@@ -26,12 +26,12 @@ public enum SkillType {
     // Passive stats
     public static final Set<SkillType> PASSIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
             new SkillType[] {SkillType.EVADE, SkillType.ARMORED, SkillType.COUNTER, SkillType.CORROSIVE,
-                    SkillType.WALL, SkillType.FLURRY, SkillType.VALOR}
+                    SkillType.WALL, SkillType.FLURRY, SkillType.VALOR, SkillType.LEGION, SkillType.PAYBACK}
     ));
 
     // Not enhancable
     public static final Set<SkillType> NO_ENHANCE_SKILLS = new HashSet<SkillType>(Arrays.asList(
-            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING }
+            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING, SkillType.BLOODLUST, SkillType.METAMORPHOSIS }
     ));
 
     public static boolean isActiveSkill(SkillType id) { return SkillType.ACTIVE_SKILLS.contains(id); }

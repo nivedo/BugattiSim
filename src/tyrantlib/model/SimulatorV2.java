@@ -115,7 +115,7 @@ public class SimulatorV2 {
             turnCount += (f.getTotalTurns() * f.getWeight());
             unitsKilled += (f.getUnitsKilled() * f.getWeight());
         }
-
+        /*
         if(options.isBrawlMode) {
             double expectedScore = 1.0 * numWins / numTotal * (50.0 + (2.0 * unitsKilled - 0.5 * turnCount) / numWins) + 5.0 * (numTotal - numWins) / numTotal;
 
@@ -125,6 +125,7 @@ public class SimulatorV2 {
                 return (int) (1000 * (1 - expectedScore / 60.0));
             }
         }
+        */
 
         int winRate = 1000 * numWins / numTotal;
         if(options.isAttack) {

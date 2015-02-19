@@ -13,6 +13,7 @@ public class Gauntlet {
 
     public void setDeckList(ArrayList<Deck> deckList) { this.deckList = deckList; }
     public ArrayList<Deck> getDeckList() { return deckList; }
+    public void add(Deck deck) { deckList.add(deck); }
 
     public void loadEncrypted(String file) {
         deckList.clear();
