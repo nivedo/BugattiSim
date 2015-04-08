@@ -139,20 +139,25 @@ public class CardHandler extends DefaultHandler{
             skillNum = 0;
         }
         else if (qName.equalsIgnoreCase("skill")) {
-            Skill skill = new Skill();
-            skill.setId(SkillType.stringToSkillType(attributes.getValue("id")));
+            if(skillNum < 3) {
+                Skill skill = new Skill();
+                skill.setId(SkillType.stringToSkillType(attributes.getValue("id")));
 
-            if(attributes.getValue("x") != null) skill.x = Integer.parseInt(attributes.getValue("x"));
-            if(attributes.getValue("y") != null) skill.y = Faction.values()[Integer.parseInt(attributes.getValue("y"))-1];
-            if(attributes.getValue("s") != null) skill.s = SkillType.stringToSkillType(attributes.getValue("s"));
-            if(attributes.getValue("c") != null) skill.c = Integer.parseInt(attributes.getValue("c"));
-            if(attributes.getValue("n") != null) skill.n = Integer.parseInt(attributes.getValue("n"));
-            if(attributes.getValue("all") != null) skill.all = Integer.parseInt(attributes.getValue("all")) != 0;
+                if (attributes.getValue("x") != null) skill.x = Integer.parseInt(attributes.getValue("x"));
+                if (attributes.getValue("y") != null)
+                    skill.y = Faction.values()[Integer.parseInt(attributes.getValue("y")) - 1];
+                if (attributes.getValue("s") != null) skill.s = SkillType.stringToSkillType(attributes.getValue("s"));
+                if (attributes.getValue("c") != null) skill.c = Integer.parseInt(attributes.getValue("c"));
+                if (attributes.getValue("n") != null) skill.n = Integer.parseInt(attributes.getValue("n"));
+                if (attributes.getValue("all") != null) skill.all = Integer.parseInt(attributes.getValue("all")) != 0;
 
-            CardSkillPair pair = new CardSkillPair(card, skill);
-            cardsBySkill.get(skill.id.ordinal()).add(pair);
+                CardSkillPair pair = new CardSkillPair(card, skill);
+                cardsBySkill.get(skill.id.ordinal()).add(pair);
 
-            card.setSkill(skill, skillNum++);
+                card.setSkill(skill, skillNum++);
+            } else {
+                // this isn't supported yet
+            }
         }
         else { activeName = qName; }
     }
@@ -160,7 +165,7 @@ public class CardHandler extends DefaultHandler{
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equalsIgnoreCase("unit")) {
-            if(cardWrapper.getSet() != 9999 && cardWrapper.getSet() != 0) {
+            if(cardWrapper.getSet() != 9999 && cardWrapper.getSet() != 0 && !cardWrapper.getFail()) {
                 cardMap.put(cardWrapper.getName().toLowerCase(), cardWrapper);
                 if(cardWrapper.isValidInDeck() && cardWrapper.getFusion() == 2 && cardWrapper.getRarity().ordinal() >= Rarity.EPIC.ordinal()) {
                     epicMap.put(cardWrapper.getName().toLowerCase(), cardWrapper);
@@ -170,6 +175,10 @@ public class CardHandler extends DefaultHandler{
                 }
                 if(cardWrapper.getFortress()==2 && cardWrapper.getSet() != CD_CUSTOM) {
                     siegeForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
+                }
+                if(cardWrapper.getFortress()==3 && cardWrapper.getSet() != CD_CUSTOM) {
+                    siegeForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
+                    defenseForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
                 }
             }
             stackLevel--;
@@ -188,38 +197,56 @@ public class CardHandler extends DefaultHandler{
             String strval = new String(ch, start, length);
             strval = strval.trim();
 
-            if(activeName.equals("id")) { card.setId(Integer.parseInt(strval)); }
-            else if (activeName.equals("card_id"))  { card.setId(Integer.parseInt(strval)); }
-            else if (activeName.equals("name"))   { cardWrapper.setName(strval); card.setName(strval); }
-            else if (activeName.equals("level"))  { card.setLevel(Integer.parseInt(strval)); }
-            else if (activeName.equals("attack")) { card.setAttack(Integer.parseInt(strval)); }
-            else if (activeName.equals("health")) { card.setHealth(Integer.parseInt(strval)); }
-            else if (activeName.equals("cost"))   { card.setWait(Integer.parseInt(strval)); }
-            else if (activeName.equals("rarity")) {
-                Rarity r = Rarity.values()[Integer.parseInt(strval)-1];
-                cardWrapper.setRarity(r);
-                card.setRarity(r);
-            }
-            else if (activeName.equals("type"))  {
-                Faction f = Faction.values()[Integer.parseInt(strval)-1];
-                cardWrapper.setType(f);
-                card.setType(f);
-            }
-            else if (activeName.equals("set"))    {
-                if(strval.isEmpty()) { strval = "2000"; }
-                cardWrapper.setSet(Integer.parseInt(strval));
-                card.setSet(Integer.parseInt(strval));
-            }
-            else if (activeName.equals("fusion_level"))   {
-                cardWrapper.setFusion(Integer.parseInt(strval));
-                card.setFusion(Integer.parseInt(strval));
-            }
-            else if (activeName.equals("fortress_type"))   {
-                cardWrapper.setFortress(Integer.parseInt(strval));
-                card.setFortress(Integer.parseInt(strval));
-            }
+            try {
+                if (activeName.equals("id")) {
+                    card.setId(Integer.parseInt(strval));
+                } else if (activeName.equals("card_id")) {
+                    card.setId(Integer.parseInt(strval));
+                } else if (activeName.equals("name")) {
+                    cardWrapper.setName(strval);
+                    card.setName(strval);
+                    //System.out.println(strval);
+                } else if (activeName.equals("level")) {
+                    card.setLevel(Integer.parseInt(strval));
+                } else if (activeName.equals("attack")) {
+                    card.setAttack(Integer.parseInt(strval));
+                } else if (activeName.equals("health")) {
+                    card.setHealth(Integer.parseInt(strval));
+                } else if (activeName.equals("cost")) {
+                    card.setWait(Integer.parseInt(strval));
+                } else if (activeName.equals("rarity")) {
+                    Rarity r = Rarity.values()[Integer.parseInt(strval) - 1];
+                    cardWrapper.setRarity(r);
+                    card.setRarity(r);
+                } else if (activeName.equals("type")) {
+                    Faction f = Faction.values()[Integer.parseInt(strval) - 1];
+                    cardWrapper.setType(f);
+                    card.setType(f);
+                } else if (activeName.equals("set")) {
+                    if (strval.isEmpty()) {
+                        strval = "2000";
+                    }
+                    cardWrapper.setSet(Integer.parseInt(strval));
+                    card.setSet(Integer.parseInt(strval));
+                } else if (activeName.equals("fusion_level")) {
+                    cardWrapper.setFusion(Integer.parseInt(strval));
+                    card.setFusion(Integer.parseInt(strval));
+                } else if (activeName.equals("fortress_type")) {
+                    cardWrapper.setFortress(Integer.parseInt(strval));
+                    card.setFortress(Integer.parseInt(strval));
+                } else if (activeName.equals("asset_bundle")) {
+                    int assetBundle = Integer.parseInt(strval);
+                    if(assetBundle == 2501) {
+                        cardWrapper.setFortress(3);
+                        card.setFortress(3);
+                    }
+                }
 
-            activeName = "";
+
+                activeName = "";
+            } catch (Exception e) {
+                card.setFail(true);
+            }
         }
     }
 }

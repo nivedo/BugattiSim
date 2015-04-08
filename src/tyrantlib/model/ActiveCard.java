@@ -27,6 +27,9 @@ public class ActiveCard {
     // Whether card successfully dealt damage
     protected boolean dealtDamage = false;
 
+    // Current card index in ActiveDeck
+    protected int index = -1;
+
     // Activated skill modifiers
     protected int enfeeble;
     protected int protect;
@@ -40,6 +43,7 @@ public class ActiveCard {
     protected boolean overloadTarget = false;
     protected boolean overloadInhibit = false;
     protected int[] enhanceX = new int[SkillType.values().length];
+    protected boolean[] evolved = new boolean[SkillType.values().length];
 
     // Passive skills and modifiers
     protected int evade;
@@ -67,6 +71,8 @@ public class ActiveCard {
     protected int bloodlustNum = 0;
     protected int berserk;
     protected int berserkNum = 0; // Total berserk benefit
+    protected int avenge;
+    protected int avengeNum = 0; // Total avenge benefit
     protected int leech;
     protected int poison;
     protected int poisoned = 0; // Poisoned value
@@ -85,13 +91,16 @@ public class ActiveCard {
         for(int i = 0; i < enhanceX.length; i++) {
             enhanceX[i] = 0;
         }
+        for(int i = 0; i < evolved.length; i++) {
+            evolved[i] = false;
+        }
 
         // Passive skills and modifiers
         evade = evadedNum = payback = paybackNum = armored = counter = corrosive = corroded = corrodedNum = flurry = flurryCD = 0;
         wall = hasFlurried = false;
 
         // Attack skills and modifiers
-        pierce = valor = valorNum = legion = legionNum = bloodlustNum = berserk = berserkNum =
+        pierce = valor = valorNum = legion = legionNum = bloodlustNum = berserk = berserkNum = avenge = avengeNum =
                 leech = poison = poisoned = inhibit = inhibited = inhibitedNum = 0;
         valorActive = false;
         bloodlust = false;
@@ -118,7 +127,7 @@ public class ActiveCard {
 
     // Effective attack
     public int getEffectiveAttack() {
-        int attackBeforeRally = attack + berserkNum + valorNum - corrodedNum - weaken;
+        int attackBeforeRally = attack + berserkNum + avengeNum +  valorNum - corrodedNum - weaken;
         if(attackBeforeRally < 0) attackBeforeRally = 0;
         return (attackBeforeRally + rally);
     }
@@ -153,15 +162,17 @@ public class ActiveCard {
         }
     }
 
+    public void setIndex(int i) { index = i; }
+
     public void onDeath() {
         // Special BGE callback
-        deck.onUnitDeath();
+        deck.onUnitDeath(index);
     }
 
     public void addHealth(int heal) {
         assert health > 0;
         health += heal;
-        if(health > card.getHealth()) health = card.getHealth();
+        if(health > (card.getHealth() + avengeNum)) health = card.getHealth() + avengeNum;
     }
 
     public boolean matchesType(Faction type) {
@@ -178,7 +189,7 @@ public class ActiveCard {
         }
     }
 
-    public boolean canHeal() { return !isDead() && (health < card.getHealth()); }
+    public boolean canHeal() { return !isDead() && (health < (card.getHealth() + avengeNum)); }
     public void doHeal(int x, boolean overload) { if(overload || !inhibited()) addHealth(x); }
 
     public boolean canProtect() { return !isDead(); }
@@ -193,7 +204,7 @@ public class ActiveCard {
     public boolean canStrike() { return !isDead(); }
     public void doStrike(int x, boolean overload, ActiveCard assault) {
         if(overload || !evaded()) {
-            int strikeDamage = x + enfeeble - (overload ? 0 : protect);
+            int strikeDamage = x + enfeeble - ((overload && assault != null) ? 0 : protect);
             if(strikeDamage > 0) { removeHealth(strikeDamage); }
             if(assault != null && paybackNum++ < payback) {
                 assault.doStrike(x, true, null);
@@ -229,17 +240,35 @@ public class ActiveCard {
         if(!inhibited()) enhanceX[skillId.ordinal()] += x;
     }
 
+    public boolean canEvolve(SkillType skillId) {
+        Skill s = card.getSkillByIndex(skillId);
+        return (s != null) && !evolved[skillId.ordinal()];
+    }
+    public void doEvolve(SkillType skillId) {
+        if(!inhibited()) evolved[skillId.ordinal()] = true;
+    }
+
     // Proposed new skill
     public boolean canOverload(boolean hasInhibit) { return canAct() && !acted && !overloaded &&
             (overloadTarget || jamActive() || (overloadInhibit && hasInhibit)); }
     public void doOverload() { if(!inhibited()) overloaded = true; }
+
+    public void doAvenge() {
+        if(avenge > 0) {
+            avengeNum += avenge;
+            addHealth(avengeNum);
+        }
+    }
 
     // PHASE CALLBACKS
 
     // Run after removing dead from field
     public void startPhase() {
         for(Skill s : getSkills()) {
-            if(s != null) { enhanceX[s.id.ordinal()] = 0; }
+            if(s != null) {
+                enhanceX[s.id.ordinal()] = 0;
+                evolved[s.id.ordinal()] = false;
+            }
         }
         enfeeble = protect = 0;
         evadedNum = 0;
@@ -260,6 +289,11 @@ public class ActiveCard {
             hasFlurried = false;
         }
 
+        // Heal refresh
+        if (leech > 0 && health > 0 && evolved[SkillType.LEECH.ordinal()]) {
+            addHealth(leech);
+        }
+
         // Take poison damage
         if(poisoned > 0) {
             int poisonDamage = poisoned - protect + enfeeble;
@@ -276,7 +310,7 @@ public class ActiveCard {
                 corrodedNum = 0;
             } else {
                 corrodedNum += corroded;
-                int corrodedMax = attack + berserkNum;
+                int corrodedMax = attack + berserkNum + avengeNum;
                 if(corrodedNum > corrodedMax) {
                     corrodedNum = corrodedMax;
                 }
@@ -284,7 +318,7 @@ public class ActiveCard {
         }
 
         // Reset vars
-        rally = weaken = enfeeble = inhibited = inhibitedNum = legionNum = bloodlustNum = 0;
+        rally = weaken = inhibited = inhibitedNum = legionNum = bloodlustNum = 0;
         jammed = false;
         bloodlust = false;
 
@@ -354,7 +388,7 @@ public class ActiveCard {
                 if(targetCard.isAssault()) {
                     if (poison > targetCard.poisoned) targetCard.poisoned = poison;
                     if (inhibit > 0) targetCard.inhibited = inhibit;
-                    if (leech > 0 && health > 0) addHealth(totalDamage < leech ? totalDamage : leech);
+                    if (leech > 0 && health > 0 && !evolved[SkillType.LEECH.ordinal()]) addHealth(totalDamage < leech ? totalDamage : leech);
                 }
 
                 if(health > 0) {
@@ -398,8 +432,13 @@ public class ActiveCard {
                 legion = s.x + enhanceVal;
             } else if (s.id == SkillType.BERSERK) {
                 berserk = s.x + enhanceVal;
+            } else if (s.id == SkillType.AVENGE) {
+                avenge = s.x + enhanceVal;
             } else if (s.id == SkillType.LEECH) {
                 leech = s.x + enhanceVal;
+            } else if (s.id == SkillType.REFRESH) {
+                leech = s.x + enhanceVal;
+                evolved[SkillType.LEECH.ordinal()] = true;
             } else if (s.id == SkillType.POISON) {
                 poison = s.x + enhanceVal;
             } else if (s.id == SkillType.INHIBIT) {

@@ -183,11 +183,21 @@ public class ActiveDeck {
         return metaEffect;
     }
 
-    public void onUnitDeath() {
+    public void onUnitDeath(int index) {
         // Special BGE
         if(reapEffect) {
             applySkill(null, reapHeal, this);
             applySkill(null, reapRally, this);
+        }
+
+        // Avenge assaults
+        if (index >= 0) {
+            if (index > 0 && assaults.get(index - 1).health > 0) {
+                assaults.get(index - 1).doAvenge();
+            }
+            if ((index + 1) < assaults.size() && assaults.get(index + 1).health > 0) {
+                assaults.get(index + 1).doAvenge();
+            }
         }
     }
 
@@ -284,6 +294,13 @@ public class ActiveDeck {
         numTargets = 0;
         for(ActiveCard card : assaults) {
             if(card.canEnhance(skillId)) { skillTargets[numTargets++] = card; }
+        }
+    }
+
+    public void setEvolveTargets(SkillType skillId) {
+        numTargets = 0;
+        for(ActiveCard card : assaults) {
+            if(card.canEvolve(skillId)) { skillTargets[numTargets++] = card; }
         }
     }
 
@@ -406,6 +423,14 @@ public class ActiveDeck {
                     card.applyLegion();
                 }
             }
+        }
+
+        for(int i = 0; i < assaults.size(); i++) {
+            assaults.get(i).setIndex(i);
+        }
+
+        for(int i = 0; i < enemyDeck.assaults.size(); i++) {
+            enemyDeck.assaults.get(i).setIndex(i);
         }
     }
 
@@ -616,9 +641,21 @@ public class ActiveDeck {
                                 }
                             }
                         } else {
-                            target = enemyDeck.getRandomTarget();
-                            if (target.doJam(overloaded, card)) {
-                                card.hasJammed = true;
+                            if (skill.n > 0) {
+                                for(int i = 0; i < skill.n; i++) {
+                                    target = enemyDeck.getRandomTarget();
+                                    if (target.doJam(overloaded, card)) {
+                                        card.hasJammed = true;
+                                    }
+                                    enemyDeck.setJamTargets();
+                                    numTargeted = enemyDeck.getNumTargets();
+                                    if(numTargeted <= 0) break;
+                                }
+                            } else {
+                                target = enemyDeck.getRandomTarget();
+                                if (target.doJam(overloaded, card)) {
+                                    card.hasJammed = true;
+                                }
                             }
                         }
                     }
@@ -640,7 +677,22 @@ public class ActiveDeck {
                     }
                 }
 
-            } else if (skill.id == SkillType.OVERLOAD) {
+            } else if (skill.id == SkillType.EVOLVE) {
+
+                this.setEvolveTargets(skill.s);
+                numTargeted = this.getNumTargets();
+                if (numTargeted > 0) {
+                    if (skill.all) {
+                        targets = this.getTargets();
+                        for (int i = 0; i < this.getNumTargets(); i++) {
+                            targets[i].doEvolve(skill.s);
+                        }
+                    } else {
+                        target = this.getRandomTarget();
+                        target.doEvolve(skill.s);
+                    }
+                }
+            }   else if (skill.id == SkillType.OVERLOAD) {
                 this.setOverloadTargets(sFaction);
                 numTargeted = this.getNumTargets();
 

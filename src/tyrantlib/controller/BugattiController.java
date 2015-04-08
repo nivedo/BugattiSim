@@ -37,7 +37,7 @@ import java.util.Collections;
  */
 public class BugattiController {
 
-    public static final String VERSION = "7.1.0";
+    public static final String VERSION = "8.0.1";
 
     public Gauntlet gauntlet = new Gauntlet();
     public Gauntlet gwAttackGauntlet = new Gauntlet();
@@ -389,7 +389,7 @@ public class BugattiController {
 
     private void initializeComboBoxes() {
         // Initialize Mode Box
-        modeBox.getItems().addAll("CCS 7.0","Brawl Mode","Guild War");
+        modeBox.getItems().addAll("CCS 8.0","Brawl Mode","Conquest","Guild War");
         modeBox.getItems().addAll(eventNames);
         modeBox.getSelectionModel().select(0);
 
@@ -441,7 +441,7 @@ public class BugattiController {
                 //benchArea.setDisable(false);
                 enableFortCheck.setDisable(false);
             } else {
-                if(!modeString.toLowerCase().contains("guild war")) {
+                if(!modeString.toLowerCase().contains("guild war") && !modeString.toLowerCase().contains("conquest") ) {
                     enableFortCheck.setDisable(true);
                 } else {
                     enableFortCheck.setDisable(false);
@@ -511,8 +511,8 @@ public class BugattiController {
         try {
             // Main CCS 6 gauntlet
             //gauntlet.loadEncrypted("ccs7.des");
-            gwAttackGauntlet.loadEncrypted("ccs7_attack.des");
-            gwDefenseGauntlet.loadEncrypted("ccs7_defense.des");
+            gwAttackGauntlet.loadEncrypted("ccs8_attack.des");
+            gwDefenseGauntlet.loadEncrypted("ccs8_defense.des");
 
             // Custom loading for event gauntlets
             BufferedReader br = new BufferedReader(new FileReader("events.decklist"));
@@ -540,11 +540,11 @@ public class BugattiController {
     public Gauntlet getAttackGauntlet() {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
-        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 3) {
+        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 4) {
             return gwAttackGauntlet;
         }
-        else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
-            return eventGauntlets.get(modeBox.getSelectionModel().getSelectedIndex() - 3);
+        else if (modeBox.getSelectionModel().getSelectedIndex() >= 4) {
+            return eventGauntlets.get(modeBox.getSelectionModel().getSelectedIndex() - 4);
         }
 
         return gauntlet;
@@ -553,10 +553,10 @@ public class BugattiController {
     public Gauntlet getDefenseGauntlet() {
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
 
-        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 3) {
+        if (selectedStr.toLowerCase().contains("guild war") || modeBox.getSelectionModel().getSelectedIndex() < 4) {
             return gwDefenseGauntlet;
         }
-        else if (modeBox.getSelectionModel().getSelectedIndex() >= 3) {
+        else if (modeBox.getSelectionModel().getSelectedIndex() >= 4) {
             // Return no defensive gauntlet for events
             return null;
         }

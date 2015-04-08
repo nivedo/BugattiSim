@@ -19,6 +19,7 @@ public class Card {
     private int set;
     private int fusion = 0;
     private int fortress = 0;
+    private boolean fail = false;
 
     // For fast lookups
     final private Skill[] skillByIndex = new Skill[SkillType.values().length];
@@ -109,6 +110,10 @@ public class Card {
     public int getFortress() { return fortress; }
 
     public void setFortress(int fortress) { this.fortress = fortress; }
+
+    public boolean getFail() { return fail; }
+
+    public void setFail(boolean b) { fail = b; }
 
     public void setSkill(Skill skill, int priority)  {
         skillByIndex[skill.id.ordinal()] = skill;

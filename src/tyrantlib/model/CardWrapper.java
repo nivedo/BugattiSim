@@ -67,6 +67,13 @@ public class CardWrapper {
         this.numLevels = numLevels;
     }
 
+    public boolean getFail() {
+        for(int i = 1; i <= numLevels; i++) {
+            if(getLevel(i).getFail()) return true;
+        }
+        return false;
+    }
+
     public boolean isValidInDeck() { return (set <= 5000); }
     public boolean isCommander()   { return (set == 7000); }
 }

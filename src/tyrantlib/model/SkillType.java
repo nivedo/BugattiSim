@@ -7,15 +7,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum SkillType {
-    ENFEEBLE, HEAL, PROTECT, RALLY, SIEGE, STRIKE, WEAKEN, JAM, ENHANCE,
-    PIERCE, BERSERK, LEECH, POISON, INHIBIT,
+    ENFEEBLE, HEAL, PROTECT, RALLY, SIEGE, STRIKE, WEAKEN, JAM, ENHANCE, EVOLVE,
+    PIERCE, BERSERK, LEECH, POISON, INHIBIT, AVENGE, REFRESH,
     EVADE, ARMORED, COUNTER, CORROSIVE, WALL, FLURRY,
     OVERLOAD, VALOR, LEGION, PAYBACK, PROGENITOR, REAPING, BLOODLUST, METAMORPHOSIS, UNKNOWN;
 
     // Activated Abilities
     public static final Set<SkillType> ACTIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
             new SkillType[]{SkillType.ENFEEBLE, SkillType.HEAL, SkillType.PROTECT, SkillType.RALLY,
-                    SkillType.SIEGE, SkillType.STRIKE, SkillType.WEAKEN, SkillType.JAM, SkillType.ENHANCE, SkillType.OVERLOAD}
+                    SkillType.SIEGE, SkillType.STRIKE, SkillType.WEAKEN, SkillType.JAM, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.OVERLOAD}
     ));
 
     // Abilities on Attack Phase
@@ -26,12 +26,12 @@ public enum SkillType {
     // Passive stats
     public static final Set<SkillType> PASSIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
             new SkillType[] {SkillType.EVADE, SkillType.ARMORED, SkillType.COUNTER, SkillType.CORROSIVE,
-                    SkillType.WALL, SkillType.FLURRY, SkillType.VALOR, SkillType.LEGION, SkillType.PAYBACK}
+                    SkillType.WALL, SkillType.FLURRY, SkillType.VALOR, SkillType.LEGION, SkillType.PAYBACK, SkillType.AVENGE, SkillType.REFRESH}
     ));
 
     // Not enhancable
     public static final Set<SkillType> NO_ENHANCE_SKILLS = new HashSet<SkillType>(Arrays.asList(
-            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING, SkillType.BLOODLUST, SkillType.METAMORPHOSIS }
+            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING, SkillType.BLOODLUST, SkillType.METAMORPHOSIS }
     ));
 
     public static boolean isActiveSkill(SkillType id) { return SkillType.ACTIVE_SKILLS.contains(id); }

@@ -56,8 +56,8 @@ public class SecurityTest {
         HashMap<Card, ArrayList<Deck>> deckMap = new HashMap<Card, ArrayList<Deck>>();
 
         try {
-            FileInputStream input = new FileInputStream(new File("ccs7-defoptimized.csv"));
-            FileOutputStream output = new FileOutputStream(new File("ccs7_defense.des"));
+            FileInputStream input = new FileInputStream(new File("GWDefense_20150407.csv"));
+            FileOutputStream output = new FileOutputStream(new File("ccs8_attack.des"));
 
             String myEncryptionKey = "CrazyAwesome";
             DESKeySpec dks = new DESKeySpec(myEncryptionKey.getBytes());
@@ -75,7 +75,7 @@ public class SecurityTest {
         }
 
         try {
-            FileInputStream input = new FileInputStream(new File("ccs7_defense.des"));
+            FileInputStream input = new FileInputStream(new File("ccs8_attack.des"));
             FileOutputStream output = new FileOutputStream(new File("decrypted.csv"));
 
             String myEncryptionKey = "CrazyAwesome";
