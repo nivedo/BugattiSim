@@ -56,10 +56,10 @@ public class SecurityTest {
         HashMap<Card, ArrayList<Deck>> deckMap = new HashMap<Card, ArrayList<Deck>>();
 
         try {
-            FileInputStream input = new FileInputStream(new File("GWDefense_20150407.csv"));
-            FileOutputStream output = new FileOutputStream(new File("ccs8_attack.des"));
+            FileInputStream input = new FileInputStream(new File("dt_attack.csv"));
+            FileOutputStream output = new FileOutputStream(new File("dt_attack.des"));
 
-            String myEncryptionKey = "CrazyAwesome";
+            String myEncryptionKey = "SpicyBanana";
             DESKeySpec dks = new DESKeySpec(myEncryptionKey.getBytes());
             SecretKey myDesKey = SecretKeyFactory.getInstance("DES").generateSecret(dks);
             Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
@@ -75,10 +75,10 @@ public class SecurityTest {
         }
 
         try {
-            FileInputStream input = new FileInputStream(new File("ccs8_attack.des"));
+            FileInputStream input = new FileInputStream(new File("dt_attack.des"));
             FileOutputStream output = new FileOutputStream(new File("decrypted.csv"));
 
-            String myEncryptionKey = "CrazyAwesome";
+            String myEncryptionKey = "SpicyBanana";
             DESKeySpec dks = new DESKeySpec(myEncryptionKey.getBytes());
             SecretKey myDesKey = SecretKeyFactory.getInstance("DES").generateSecret(dks);
             Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");

@@ -37,7 +37,7 @@ public class BattleTest {
         }
         */
 
-        Deck deck1 = new Deck("Malort","Stoneheart, Ezamit Tranq, Erebus City Sector, Scorched Hellwing, Scorched Hellwing, Dreamhaunter, Gehenna Cursed, Erebus City Sector");
+        //Deck deck1 = new Deck("empress","10 * Lockon Sight");
         //Deck deck1 = new Deck("Daedalus","Cockatrice Baxis, Dreamhaunter, Gehenna Cursed, 2 * Scorched Hellwing, Styxasis, Erebus City Sector");
         //Deck deck2 = new Deck(
         //  		"Jotun Max","3 * Jotun's Laser",
@@ -45,8 +45,9 @@ public class BattleTest {
         //Deck deck2 = new Deck("Barracus","Warp Alchemist Lv.6,Warp Alchemist Lv.6,Crogall Static Lv.6,Narscious the Eerie Lv.6,Sacred Sanctuary Lv.6,Narscious the Eerie Lv.6,Charincinerator Lv.6,Heart Devourer Lv.6,Heart Devourer Lv.6,Lord Hades Lv.6");
         //Deck deck2 = new Deck("Constantine","Blizzard, Dreamhaunter, Razor Pinion, Stoneheart, Ezamit Tranq, Council's Hubris, Razor Pinion, Jyack, Styxasis, Serraco Sire");
         //Deck deck2 = new Deck("Typhon Vex","10 * Stoneheart");
-        Deck deck2 = new Deck("Typhon Vex","Stoneheart, Dreamhaunter, 2 * Shock Disruptor, Trench Hurler, Serraco Sire, Ezamit Tranq");
-        //Deck deck2 = new Deck("Constantine","Blizzard, 2 * Razor Pinion, Erebus City Sector, Razor Pinion, Council's Hubris, 2 * Razor Pinion, Jyack, Council's Hubris");
+        //Deck deck1 = new Deck("Kylen","2 * Xeno Harvestman, Nexor's Vault, Stoneheart, Erebus City Sector, Scorched Hellwing");
+        Deck deck1 = new Deck("Nexor","Styxasis,Arch Nova Alpha,Dune Runner,Dune Runner,High Constable,Penumbra Sharp");
+        //Deck deck2 = new Deck("Kylen","2 * Xeno Harvestman, 2 * Nexor's Vault, 6 * Xeno Harvestman");
         //Deck deck1 = new Deck("Constantine","4 * Razor Pinion, Council's Hubris, Sacred Sanctuary, Council's Hubris, Razor Pinion, Styxasis, Serraco Sire");
         //Deck deck2 = new Deck("Typhon Vex","Veracious Fenrir, Dreamhaunter, Stoneheart, Tempest CItadel, Shock Disruptor, Jyack, Perzix World Eater, Serraco Sire, Tempest Citadel, Shock Disruptor");
         //ActiveDeck deck2 = new ActiveDeck(new Deck("Barracus","Warp Alchemist Lv.6,Warp Alchemist Lv.6,Crogall Static Lv.6,Narscious the Eerie Lv.6,Sacred Sanctuary Lv.6,Narscious the Eerie Lv.6," +
@@ -60,7 +61,7 @@ public class BattleTest {
 
         // System.out.println(cardHandler.getCard("Jilted Baughe",6).toFullString());
 
-        runBattle(deck1, deck2, null, null);
+        runBattle(deck1, deck1, null, null);
         //runBattle(deck1, deck2, corrosiveSpore, lightningCannon);
         //runBattle(deck1, deck2, corrosiveSpore, corrosiveSpore);
         //runBattle(deck1, deck2, lightningCannon, lightningCannon);
@@ -70,13 +71,16 @@ public class BattleTest {
     }
 
     private static void runBattle(Deck deck1, Deck deck2, Card siege1, Card siege2) {
-        Field f = new Field(deck1, deck2, true, 1000);
+        Field f = new Field(deck1, deck2, true, 10000);
         BGOptions bgOptions = new BGOptions();
-        bgOptions.bgEffect = SkillType.REAPING;
-        bgOptions.bgX = 3;
-        bgOptions.playerSiege = new Card[] { siege1, siege2 };
+        //bgOptions.bgEffect = SkillType.REAPING;
+        //bgOptions.bgX = 3;
+        //bgOptions.playerSiege = new Card[] { siege1, siege2 };
         f.setBGOptions(bgOptions, true);
+        long startTime = System.nanoTime();
         f.run();
+        long endTime = System.nanoTime();
         System.out.println(f.getNumWins() + " wins (" + 100.0 * f.getNumWins() / f.getNumRuns() + "%)");
+        System.out.println("Time Elapsed: " + (endTime - startTime)/1e7 + "ms");
     }
 }

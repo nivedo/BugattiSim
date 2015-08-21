@@ -9,8 +9,8 @@ public class OptimalSiege {
         Gauntlet attackGauntlet = new Gauntlet();
         Gauntlet defenseGauntlet = new Gauntlet();
 
-        attackGauntlet.loadEncrypted("ccs7_attack.des");
-        defenseGauntlet.loadEncrypted("ccs7_defense.des");
+        attackGauntlet.loadEncrypted("ccs9_attack.des");
+        defenseGauntlet.loadEncrypted("ccs9_defense.des");
 
         // Set up defensive decks
         testGauntlet.add(defenseGauntlet.getDeckList().get(defenseGauntlet.size()-1));
@@ -24,9 +24,9 @@ public class OptimalSiege {
         testGauntlet.add(defenseGauntlet.getDeckList().get(defenseGauntlet.size()-9));
 
         BGOptions options = new BGOptions();
-        options.bgEffect = SkillType.WEAKEN;
-        options.bgX = 3;
-        options.isEnhance = false;
+        options.bgEffect = SkillType.ENDURINGRAGE;
+        //options.bgX = 2;
+        //options.isEnhance = false;
         options.isAttack = true;
 
         String bestStructures = "";

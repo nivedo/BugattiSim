@@ -9,8 +9,8 @@ public class OptimalDefense {
         Gauntlet attackGauntlet = new Gauntlet();
         Gauntlet defenseGauntlet = new Gauntlet();
 
-        attackGauntlet.loadEncrypted("ccs7_attack.des");
-        defenseGauntlet.loadEncrypted("ccs7_defense.des");
+        attackGauntlet.loadEncrypted("ccs9_attack.des");
+        defenseGauntlet.loadEncrypted("ccs9_defense.des");
 
         // Set up defensive decks
         //testGauntlet.add(new Deck("Typhon Vex","3 * Guillotine Grinder, Dreamhaunter, Obsidian, Trench Hurler"));
@@ -29,9 +29,9 @@ public class OptimalDefense {
         testGauntlet.add(attackGauntlet.getDeckList().get(attackGauntlet.size()-9));
 
         BGOptions options = new BGOptions();
-        options.bgEffect = SkillType.WEAKEN;
-        options.bgX = 3;
-        options.isEnhance = false;
+        //options.bgEffect = SkillType.TURNINGTIDE;
+        //options.bgX = 2;
+        //options.isEnhance = false;
         options.isAttack = false;
 
         String bestStructures = "Corrosive Spore,Death Factory";

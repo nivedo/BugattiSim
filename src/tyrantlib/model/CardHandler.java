@@ -166,6 +166,9 @@ public class CardHandler extends DefaultHandler{
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (qName.equalsIgnoreCase("unit")) {
             if(cardWrapper.getSet() != 9999 && cardWrapper.getSet() != 0 && !cardWrapper.getFail()) {
+                if(cardMap.containsKey(cardWrapper.getName().toLowerCase())) {
+                    System.out.println("WARNING: Repeated Card -- " + cardWrapper.getName().toLowerCase());
+                }
                 cardMap.put(cardWrapper.getName().toLowerCase(), cardWrapper);
                 if(cardWrapper.isValidInDeck() && cardWrapper.getFusion() == 2 && cardWrapper.getRarity().ordinal() >= Rarity.EPIC.ordinal()) {
                     epicMap.put(cardWrapper.getName().toLowerCase(), cardWrapper);
@@ -177,8 +180,8 @@ public class CardHandler extends DefaultHandler{
                     siegeForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
                 }
                 if(cardWrapper.getFortress()==3 && cardWrapper.getSet() != CD_CUSTOM) {
-                    siegeForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
-                    defenseForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
+                    //siegeForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
+                    //defenseForts.add(cardWrapper.getLevel(cardWrapper.getNumLevels()));
                 }
             }
             stackLevel--;
@@ -209,7 +212,9 @@ public class CardHandler extends DefaultHandler{
                 } else if (activeName.equals("level")) {
                     card.setLevel(Integer.parseInt(strval));
                 } else if (activeName.equals("attack")) {
-                    card.setAttack(Integer.parseInt(strval));
+                    if(!strval.equals("")) {
+                        card.setAttack(Integer.parseInt(strval));
+                    }
                 } else if (activeName.equals("health")) {
                     card.setHealth(Integer.parseInt(strval));
                 } else if (activeName.equals("cost")) {
@@ -235,10 +240,12 @@ public class CardHandler extends DefaultHandler{
                     cardWrapper.setFortress(Integer.parseInt(strval));
                     card.setFortress(Integer.parseInt(strval));
                 } else if (activeName.equals("asset_bundle")) {
-                    int assetBundle = Integer.parseInt(strval);
-                    if(assetBundle == 2501) {
-                        cardWrapper.setFortress(3);
-                        card.setFortress(3);
+                    if(!strval.equals("")) {
+                        int assetBundle = Integer.parseInt(strval);
+                        if (assetBundle == 2501) {
+                            cardWrapper.setFortress(3);
+                            card.setFortress(3);
+                        }
                     }
                 }
 
@@ -246,6 +253,8 @@ public class CardHandler extends DefaultHandler{
                 activeName = "";
             } catch (Exception e) {
                 card.setFail(true);
+                e.printStackTrace();
+                System.out.println("CARD FAILED -- " + card.getName());
             }
         }
     }

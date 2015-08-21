@@ -23,11 +23,6 @@ import tyrantlib.view.*;
 
 import org.controlsfx.dialog.Dialogs;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.DESKeySpec;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +32,7 @@ import java.util.Collections;
  */
 public class BugattiController {
 
-    public static final String VERSION = "8.0.1";
+    public static final String VERSION = "9.0.3";
 
     public Gauntlet gauntlet = new Gauntlet();
     public Gauntlet gwAttackGauntlet = new Gauntlet();
@@ -389,7 +384,7 @@ public class BugattiController {
 
     private void initializeComboBoxes() {
         // Initialize Mode Box
-        modeBox.getItems().addAll("CCS 8.0","Brawl Mode","Conquest","Guild War");
+        modeBox.getItems().addAll("Gauntlet 9.0","Brawl Mode","Conquest","Guild War");
         modeBox.getItems().addAll(eventNames);
         modeBox.getSelectionModel().select(0);
 
@@ -403,9 +398,15 @@ public class BugattiController {
                     skillTypes.add("Enhance All " + skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " " + i);
                 }
             }
-            if(stype == SkillType.PROGENITOR || stype == SkillType.REAPING || stype == SkillType.BLOODLUST || stype == SkillType.METAMORPHOSIS || SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
+            if(stype == SkillType.PROGENITOR || stype == SkillType.REAPING || stype == SkillType.COUNTERFLUX ||
+                    stype == SkillType.BLOODLUST || stype == SkillType.METAMORPHOSIS || stype == SkillType.TURNINGTIDE || stype == SkillType.ENDURINGRAGE ||
+                    stype == SkillType.FORTIFICATION || SkillType.isActiveSkill(stype) && stype != SkillType.ENHANCE) {
                 switch(stype) {
                     case PROGENITOR:
+                    case COUNTERFLUX:
+                    case FORTIFICATION:
+                    case TURNINGTIDE:
+                    case ENDURINGRAGE:
                     case METAMORPHOSIS:
                         skillName = stype.name();
                         skillTypes.add(skillName.substring(0, 1).toUpperCase() + skillName.substring(1).toLowerCase() + " 1");
@@ -441,7 +442,7 @@ public class BugattiController {
                 //benchArea.setDisable(false);
                 enableFortCheck.setDisable(false);
             } else {
-                if(!modeString.toLowerCase().contains("guild war") && !modeString.toLowerCase().contains("conquest") ) {
+                if(modeString.toLowerCase().contains("gauntlet") || modeString.toLowerCase().contains("brawl") ) {
                     enableFortCheck.setDisable(true);
                 } else {
                     enableFortCheck.setDisable(false);
@@ -449,7 +450,7 @@ public class BugattiController {
                 optDefenseRadio.setDisable(false);
                 //if(optOrderRadio.isSelected()) benchArea.setDisable(true);
             }
-            if(modeString.toLowerCase().contains("ccs")) {
+            if(modeString.toLowerCase().contains("gauntlet")) {
                 bgEffectBox.setDisable(true);
             } else {
                 bgEffectBox.setDisable(false);
@@ -511,8 +512,8 @@ public class BugattiController {
         try {
             // Main CCS 6 gauntlet
             //gauntlet.loadEncrypted("ccs7.des");
-            gwAttackGauntlet.loadEncrypted("ccs8_attack.des");
-            gwDefenseGauntlet.loadEncrypted("ccs8_defense.des");
+            gwAttackGauntlet.loadEncrypted("ccs9_attack.des");
+            gwDefenseGauntlet.loadEncrypted("ccs9_defense.des");
 
             // Custom loading for event gauntlets
             BufferedReader br = new BufferedReader(new FileReader("events.decklist"));
@@ -623,7 +624,7 @@ public class BugattiController {
 
         String selectedStr = (String) modeBox.getSelectionModel().getSelectedItem();
         if(selectedStr.toLowerCase().contains("event")) {
-            options.surge = false;
+            options.surge = false; // TODO: CHANGE THIS BACK
         }
         if(selectedStr.toLowerCase().contains("brawl")) {
             options.isBrawlMode = true;
@@ -645,7 +646,7 @@ public class BugattiController {
         weights.clear();
         useMultiOptions = false;
 
-        if(selectedStr.toLowerCase().contains("ccs")) {
+        if(selectedStr.toLowerCase().contains("gauntlet")) {
             CardHandler handler = CardHandler.getInstance();
             useMultiOptions = true;
 
@@ -655,6 +656,10 @@ public class BugattiController {
             op0.playerSiege[1] = siegeCard;
             op0.enemySiege[0] = siegeCard;
             op0.enemySiege[1] = siegeCard;
+
+            Card defCard = handler.getCard("CDDefense0");
+            op0.playerDefense[0] = siegeCard;
+            op0.enemyDefense[0] = siegeCard;
 
             optionsList.add(op0);
             weights.add(0.333);
@@ -666,6 +671,10 @@ public class BugattiController {
             op1.enemySiege[0] = siegeCard;
             op1.enemySiege[1] = siegeCard;
 
+            defCard = handler.getCard("CDDefense0");
+            op1.playerDefense[0] = siegeCard;
+            op1.enemyDefense[0] = siegeCard;
+
             optionsList.add(op1);
             weights.add(0.333);
 
@@ -675,6 +684,10 @@ public class BugattiController {
             op2.playerSiege[1] = siegeCard;
             op2.enemySiege[0] = siegeCard;
             op2.enemySiege[1] = siegeCard;
+
+            defCard = handler.getCard("CDDefense0");
+            op2.playerDefense[0] = siegeCard;
+            op2.enemyDefense[0] = siegeCard;
 
             optionsList.add(op2);
             weights.add(0.333);

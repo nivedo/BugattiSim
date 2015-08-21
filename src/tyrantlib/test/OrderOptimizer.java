@@ -22,8 +22,8 @@ public class OrderOptimizer {
         HashMap<Card, ArrayList<Deck>> deckMap = new HashMap<Card, ArrayList<Deck>>();
 
         try {
-            atkGauntlet.loadEncrypted("ccs7.des");
-            BufferedReader br = new BufferedReader(new FileReader("ccs7-defense.csv"));
+            atkGauntlet.loadEncrypted("ccs8_defense.des");
+            BufferedReader br = new BufferedReader(new FileReader("ccs9-attack-unoptimized.csv"));
             String line;
             while ((line = br.readLine()) != null) {
                 String arr[] = line.split(",", 2);
@@ -119,7 +119,7 @@ public class OrderOptimizer {
         }
 
         try {
-            PrintWriter writer = new PrintWriter("ccs7-defoptimized.csv", "UTF-8");
+            PrintWriter writer = new PrintWriter("ccs9-attack.csv", "UTF-8");
             for (Deck deck : optimizedDecks) {
                 String deckString = deck.getCommander().toString();
                 for(Card card : deck.getCards()) {

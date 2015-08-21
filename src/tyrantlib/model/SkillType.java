@@ -7,15 +7,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum SkillType {
-    ENFEEBLE, HEAL, PROTECT, RALLY, SIEGE, STRIKE, WEAKEN, JAM, ENHANCE, EVOLVE,
+    ENFEEBLE, HEAL, MEND, PROTECT, RALLY, SIEGE, BESIEGE, STRIKE, WEAKEN, JAM, ENHANCE, EVOLVE,
     PIERCE, BERSERK, LEECH, POISON, INHIBIT, AVENGE, REFRESH,
-    EVADE, ARMORED, COUNTER, CORROSIVE, WALL, FLURRY,
-    OVERLOAD, VALOR, LEGION, PAYBACK, PROGENITOR, REAPING, BLOODLUST, METAMORPHOSIS, UNKNOWN;
+    EVADE, ARMORED, SWIPE, COUNTER, CORROSIVE, WALL, FLURRY,
+    OVERLOAD, VALOR, LEGION, PAYBACK, PROGENITOR, REAPING, COUNTERFLUX, BLOODLUST, METAMORPHOSIS, FORTIFICATION, TURNINGTIDE, ENDURINGRAGE, UNKNOWN;
 
     // Activated Abilities
     public static final Set<SkillType> ACTIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
-            new SkillType[]{SkillType.ENFEEBLE, SkillType.HEAL, SkillType.PROTECT, SkillType.RALLY,
-                    SkillType.SIEGE, SkillType.STRIKE, SkillType.WEAKEN, SkillType.JAM, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.OVERLOAD}
+            new SkillType[]{SkillType.ENFEEBLE, SkillType.HEAL, SkillType.MEND, SkillType.PROTECT, SkillType.RALLY,
+                    SkillType.SIEGE, SkillType.BESIEGE, SkillType.STRIKE, SkillType.WEAKEN, SkillType.JAM, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.OVERLOAD}
     ));
 
     // Abilities on Attack Phase
@@ -25,13 +25,13 @@ public enum SkillType {
 
     // Passive stats
     public static final Set<SkillType> PASSIVE_SKILLS = new HashSet<SkillType>(Arrays.asList(
-            new SkillType[] {SkillType.EVADE, SkillType.ARMORED, SkillType.COUNTER, SkillType.CORROSIVE,
+            new SkillType[] {SkillType.EVADE, SkillType.ARMORED, SkillType.SWIPE, SkillType.COUNTER, SkillType.CORROSIVE,
                     SkillType.WALL, SkillType.FLURRY, SkillType.VALOR, SkillType.LEGION, SkillType.PAYBACK, SkillType.AVENGE, SkillType.REFRESH}
     ));
 
     // Not enhancable
     public static final Set<SkillType> NO_ENHANCE_SKILLS = new HashSet<SkillType>(Arrays.asList(
-            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING, SkillType.BLOODLUST, SkillType.METAMORPHOSIS }
+            new SkillType[] {SkillType.UNKNOWN, SkillType.ENHANCE, SkillType.EVOLVE, SkillType.WALL, SkillType.PROGENITOR, SkillType.REAPING, SkillType.COUNTERFLUX, SkillType.BLOODLUST, SkillType.METAMORPHOSIS, SkillType.FORTIFICATION, SkillType.TURNINGTIDE, SkillType.ENDURINGRAGE}
     ));
 
     public static boolean isActiveSkill(SkillType id) { return SkillType.ACTIVE_SKILLS.contains(id); }

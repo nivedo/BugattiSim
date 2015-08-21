@@ -129,6 +129,19 @@ public class Card {
     public boolean isAssault()     { return (set != 7000 && attack >= 0); }
     public boolean isStructure()   { return (set != 7000 && attack < 0); }
 
+    // Card Type by ID
+    /*
+    if (c.ID >= 1000 && c.ID < 2000) || (c.ID >= 25000 && c.ID < 30000) {
+        c.CardType = CT_COMMANDER
+    }
+    if (c.ID >= 2000 && c.ID < 3000 || c.ID >= 8000 && c.ID < 10000) || (c.ID >= 17000 && c.ID < 25000) {
+        c.CardType = CT_STRUCTURE
+    }
+    if !(c.ID >= 1000 && (c.ID < 4000 || c.ID >= 8000) && (c.ID < 10000 || c.ID >= 17000)) || c.ID >= 30000 {
+        c.CardType = CT_ASSAULT
+    }
+    */
+
     @Override
     public String toString() {
         return name + " Lv." + level;

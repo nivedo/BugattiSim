@@ -51,6 +51,8 @@ public class ActiveCard {
     protected int payback;
     protected int paybackNum = 0;
     protected int armored;
+    protected int swipe;
+    protected int fortify = 0;
     protected int counter;
     protected int corrosive;
     protected int corroded = 0; // Corroded value
@@ -96,7 +98,7 @@ public class ActiveCard {
         }
 
         // Passive skills and modifiers
-        evade = evadedNum = payback = paybackNum = armored = counter = corrosive = corroded = corrodedNum = flurry = flurryCD = 0;
+        evade = evadedNum = payback = paybackNum = armored = fortify = counter = corrosive = corroded = corrodedNum = flurry = flurryCD = 0;
         wall = hasFlurried = false;
 
         // Attack skills and modifiers
@@ -123,6 +125,11 @@ public class ActiveCard {
     public boolean isCommander() { return card.isCommander(); }
     public boolean isStructure() { return card.isStructure(); }
 
+    public int getArmor() {
+        if(armored > fortify) return armored;
+        return fortify;
+    }
+
     // SIMULATION FUNCTIONS
 
     // Effective attack
@@ -130,6 +137,14 @@ public class ActiveCard {
         int attackBeforeRally = attack + berserkNum + avengeNum +  valorNum - corrodedNum - weaken;
         if(attackBeforeRally < 0) attackBeforeRally = 0;
         return (attackBeforeRally + rally);
+    }
+
+    public int getWeaken() {
+        int currentAttack = attack + berserkNum + avengeNum +  valorNum - corrodedNum;
+        if (currentAttack < weaken) {
+            return currentAttack;
+        }
+        return weaken;
     }
 
     public boolean isDead() { return (health <= 0); }
@@ -180,11 +195,11 @@ public class ActiveCard {
     }
 
     public boolean canEnfeeble() { return !isDead(); }
-    public void doEnfeeble(int x, boolean overload, ActiveCard assault) {
+    public void doEnfeeble(int x, boolean overload, ActiveCard assault, boolean isPayback) {
         if(overload || !evaded()) {
             enfeeble += x;
-            if(assault != null && paybackNum++ < payback) {
-                assault.doEnfeeble(x, true, null);
+            if(assault != null && !isPayback && paybackNum++ < payback) {
+                assault.doEnfeeble(x, true, this, true);
             }
         }
     }
@@ -202,32 +217,40 @@ public class ActiveCard {
     public void doSiege(int x, boolean overload) { if(overload || !evaded()) { removeHealth(x); } }
 
     public boolean canStrike() { return !isDead(); }
-    public void doStrike(int x, boolean overload, ActiveCard assault) {
+    public void doStrike(int x, boolean overload, ActiveCard assault, boolean isPayback) {
         if(overload || !evaded()) {
             int strikeDamage = x + enfeeble - ((overload && assault != null) ? 0 : protect);
             if(strikeDamage > 0) { removeHealth(strikeDamage); }
-            if(assault != null && paybackNum++ < payback) {
-                assault.doStrike(x, true, null);
+            if(assault != null && !isPayback && paybackNum++ < payback) {
+                assault.doStrike(x, true, this, true);
             }
         }
     }
 
+    public void doSwipe(int x) {
+        int swipeDamage = x + enfeeble - protect;
+        if(swipeDamage > 0) { removeHealth(swipeDamage); }
+    }
+
     public boolean canWeaken() { return canAct() && (getEffectiveAttack() > 0); }
-    public void doWeaken(int x, boolean overload, ActiveCard assault) {
+    public void doWeaken(int x, boolean overload, ActiveCard assault, boolean isPayback) {
         if(overload || !evaded()) {
             weaken += x;
-            if(assault != null && paybackNum++ < payback) {
-                assault.doWeaken(x, true, null);
+            if(assault.deck.isTurningTide()) {
+                assault.deck.onWeaken(getWeaken());
+            }
+            if(assault != null && !isPayback && paybackNum++ < payback) {
+                assault.doWeaken(x, true, this, true);
             }
         }
     }
 
     // Jam returns TRUE if jam was successful
     public boolean canJam() { return canAct(); }
-    public boolean doJam(boolean overload, ActiveCard assault) {
+    public boolean doJam(boolean overload, ActiveCard assault, boolean isPayback) {
         jammed = (overload || !evaded());
-        if(assault != null && jammed && paybackNum++ < payback) {
-            assault.doJam(true, null);
+        if(assault != null && !isPayback && jammed && paybackNum++ < payback) {
+            assault.doJam(true, this, true);
         }
         return jammed;
     }
@@ -321,6 +344,7 @@ public class ActiveCard {
         rally = weaken = inhibited = inhibitedNum = legionNum = bloodlustNum = 0;
         jammed = false;
         bloodlust = false;
+        fortify = 0;
 
         // Reset flags
         attacked = false;
@@ -365,10 +389,15 @@ public class ActiveCard {
 
             // Add enfeebled to damage because pierce != enfeeble
             int totalDamage = effectiveAttack;
-            int totalProtect = targetCard.protect + targetCard.armored - pierce;
+            int totalProtect = targetCard.protect + targetCard.getArmor() - pierce;
             if (totalProtect < 0) totalProtect = 0;
 
             totalDamage = totalDamage - totalProtect + targetCard.enfeeble + legionNum + bloodlustNum;
+
+            // Apply Venom if Poison evolved, target is poisoned
+            if(targetCard.poisoned > 0 && poison > 0 && evolved[SkillType.POISON.ordinal()]) {
+                totalDamage += poison;
+            }
 
             if (totalDamage > 0 && targetCard.health > 0) {
                 targetCard.removeHealth(totalDamage);
@@ -378,6 +407,14 @@ public class ActiveCard {
 
                 // Apply counter damage first
                 if (targetCard.counter > 0) {
+                    // Trigger counterflux, round up
+                    if(targetCard.health > 0 && targetCard.isAssault() && deck.isCounterflux()) {
+                        int fluxBonus = (targetCard.counter + 3) / 4;
+                        if(fluxBonus > 0) {
+                            targetCard.berserkNum += fluxBonus;
+                            targetCard.addHealth(fluxBonus);
+                        }
+                    }
                     int counterDamage = targetCard.counter - protect + enfeeble;
                     if(counterDamage > 0 && health > 0) {
                         removeHealth(counterDamage);
@@ -393,7 +430,14 @@ public class ActiveCard {
 
                 if(health > 0) {
                     // Apply berserk
-                    if (berserk > 0) berserkNum += berserk;
+                    if (berserk > 0) {
+                        berserkNum += berserk;
+                        if(deck.isEnduringRage()) {
+                            int rageBonus = (berserk + 1) / 2;
+                            doProtect(rageBonus, true);
+                            doHeal(rageBonus, true);
+                        }
+                    }
                     // Apply defensive corrosive
                     if (targetCard.corrosive > corroded) corroded = targetCard.corrosive;
                 }
@@ -416,6 +460,8 @@ public class ActiveCard {
                 payback = s.x + enhanceVal;
             } else if (s.id == SkillType.ARMORED) {
                 armored = s.x + enhanceVal;
+            } else if (s.id == SkillType.SWIPE) {
+                swipe = s.x + enhanceVal;
             } else if (s.id == SkillType.COUNTER) {
                 counter = s.x + enhanceVal;
             } else if (s.id == SkillType.CORROSIVE) {
@@ -445,10 +491,13 @@ public class ActiveCard {
                 inhibit = s.x + enhanceVal;
             } else if (s.id == SkillType.JAM) {
                 jam = s.c - enhanceVal;
+            } else if (s.id == SkillType.BESIEGE) {
+                overloadTarget = true;
+                evolved[SkillType.SIEGE.ordinal()] = true;
             } else if (s.id == SkillType.SIEGE || s.id == SkillType.ENFEEBLE ||
                     s.id == SkillType.STRIKE || s.id == SkillType.WEAKEN) {
                 overloadTarget = true;
-            } else if (s.id == SkillType.HEAL || s.id == SkillType.PROTECT || s.id == SkillType.RALLY) {
+            } else if (s.id == SkillType.HEAL || s.id == SkillType.MEND || s.id == SkillType.PROTECT || s.id == SkillType.RALLY) {
                 overloadInhibit = true;
             }
         }

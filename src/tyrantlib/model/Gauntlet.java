@@ -20,7 +20,7 @@ public class Gauntlet {
         try {
             FileInputStream input = new FileInputStream(new File(file));
 
-            String myEncryptionKey = "CrazyAwesome";
+            String myEncryptionKey = "SpicyBanana";
             DESKeySpec dks = new DESKeySpec(myEncryptionKey.getBytes());
             SecretKey myDesKey = SecretKeyFactory.getInstance("DES").generateSecret(dks);
             Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");

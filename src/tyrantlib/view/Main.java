@@ -25,7 +25,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         if(!checkLicense()) {
-            Dialogs.create().owner(primaryStage).title("Error!").masthead("License Invalid").message("Please Update Your CCS License!").showError();
+            Dialogs.create().owner(primaryStage).title("Error!").masthead("License Invalid").message("Please Update Your License!").showError();
             System.exit(1);
         }
         this.primaryStage = primaryStage;
@@ -36,7 +36,7 @@ public class Main extends Application {
         Parent root = loader.load();
         BugattiController controller = loader.getController();
 
-        primaryStage.setTitle("CrazyDiamond Composite Score " + BugattiController.VERSION);
+        primaryStage.setTitle("BugattiSim " + BugattiController.VERSION);
         primaryStage.setScene(new Scene(root,1280,750));
         primaryStage.getIcons().add(new Image("file:icon.png"));
 

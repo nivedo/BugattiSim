@@ -103,42 +103,42 @@ public class SpamScoreTest {
             }
             */
 
-            attackGauntlet.loadEncrypted("ccs7_attack.des");
-            defenseGauntlet.loadEncrypted("ccs7_defense.des");
+            attackGauntlet.loadEncrypted("ccs9_attack.des");
+            defenseGauntlet.loadEncrypted("ccs9_defense.des");
 
             BGOptions options = new BGOptions();
-            options.bgEffect = SkillType.RALLY;
-            options.isEnhance = false;
-            options.isBrawlMode = true;
-            options.surge = true;
-            options.bgX = 2;
+            //options.bgEffect = SkillType.RALLY;
+            //options.isEnhance = false;
+            //options.isBrawlMode = true;
+            //options.surge = true;
+            //options.bgX = 2;
 
             Map<String, CardWrapper> cardMap = CardHandler.getInstance().getEpicMap();
             for(Entry<String, CardWrapper> entry : cardMap.entrySet()) {
                 CardWrapper wrapper = entry.getValue();
                 if(wrapper.getName().equals("Trench Legion") || wrapper.getName().equals("Trench Hurler")) System.out.println(wrapper.getLevel(6).toFullString());
-                Simulator sim1 = new Simulator(new Deck("Barracus","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim1 = new Simulator(new Deck("Lord Halcyon","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim1.setMultiOptions(optionsList, weights);
                 regression1.add(sim1);
-                Simulator sim2 = new Simulator(new Deck("Constantine", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim2 = new Simulator(new Deck("Silus the Corrupt", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim2.setMultiOptions(optionsList, weights);
                 regression2.add(sim2);
-                Simulator sim3 = new Simulator(new Deck("Nexor","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim3 = new Simulator(new Deck("Empress","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim3.setMultiOptions(optionsList, weights);
                 regression3.add(sim3);
-                Simulator sim4 = new Simulator(new Deck("Halcyon", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim4 = new Simulator(new Deck("General Barracus", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim4.setMultiOptions(optionsList, weights);
                 regression4.add(sim4);
-                Simulator sim5 = new Simulator(new Deck("Brood Mother","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim5 = new Simulator(new Deck("Malort Blightmind","10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim5.setMultiOptions(optionsList, weights);
                 regression5.add(sim5);
-                Simulator sim6 = new Simulator(new Deck("Dracorex", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim6 = new Simulator(new Deck("Daedalus Enraged", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim6.setMultiOptions(optionsList, weights);
                 regression6.add(sim6);
-                Simulator sim7 = new Simulator(new Deck("Typhon Vex", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim7 = new Simulator(new Deck("Typhon The Mad", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim7.setMultiOptions(optionsList, weights);
                 regression7.add(sim7);
-                Simulator sim8 = new Simulator(new Deck("Krellus", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
+                Simulator sim8 = new Simulator(new Deck("Arkadios Ultra", "10 * " + wrapper.getName()), attackGauntlet, defenseGauntlet, options);
                 if(useMultiOptions) sim8.setMultiOptions(optionsList, weights);
                 regression8.add(sim8);
             }
@@ -155,9 +155,9 @@ public class SpamScoreTest {
         long startTime = System.currentTimeMillis();
 
         try {
-            PrintWriter writer = new PrintWriter("ccs7rally2.csv", "UTF-8");
+            PrintWriter writer = new PrintWriter("ccs9-spamscore.csv", "UTF-8");
 
-            String rowString = ",Barracus,,Constantine,,Nexor,,Halcyon,,Brood Mother,,Dracorex,,Typhon Vex,,Krellus,,";
+            String rowString = ",Lord Halcyon,,Silus the Corrupt,,Empress,,General Barracus,,Malort Blightmind,,Daedalus Enraged,,Typhon the Mad,,Arkadios Ultra,,";
             writer.println(rowString);
 
             for(int i = 0; i < regression1.size(); i++) {
